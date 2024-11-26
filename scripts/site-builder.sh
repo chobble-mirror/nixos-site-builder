@@ -5,45 +5,50 @@ set -euo pipefail
 # SITE_DOMAIN - domain of the site (e.g., example.com)
 # GIT_REPO - git repository URL
 
-# Debug output
 echo "Starting site builder for ${SITE_DOMAIN}"
 echo "Git repo: ${GIT_REPO}"
 
-# Create working directory
+REPO_DIR="/var/tmp/site-builder-${SITE_DOMAIN}"
 WORK_DIR=$(mktemp -d)
 trap 'rm -rf ${WORK_DIR}' EXIT
 
-# Store current HEAD if it exists
+needs_rebuild=0
 old_rev=""
-if [ -d "/var/lib/site-builder/${SITE_DOMAIN}/repo/.git" ]; then
-    cd "/var/lib/site-builder/${SITE_DOMAIN}/repo"
+
+# Try to use existing repo if it exists and is valid
+if [ -d "${REPO_DIR}/.git" ]; then
+    echo "Found existing repository, attempting to update..."
+    cd "${REPO_DIR}"
     old_rev=$(git rev-parse HEAD)
 
-    # Update repo
-    echo "Updating existing repository..."
-    git fetch origin
-    git reset --hard origin/master
-    git clean -fdx
+    if git fetch origin; then
+        git reset --hard origin/master
+        git clean -fdx
+    else
+        echo "Update failed, falling back to fresh clone"
+        rm -rf "${REPO_DIR}"
+        git -c safe.directory='*' clone "${GIT_REPO}" "${REPO_DIR}"
+        needs_rebuild=1
+    fi
 else
-    # Fresh clone with safe directory settings
-    echo "Cloning repository..."
-    mkdir -p "/var/lib/site-builder/${SITE_DOMAIN}"
-    rm -rf "/var/lib/site-builder/${SITE_DOMAIN}/repo"
-    git -c safe.directory='*' clone "${GIT_REPO}" "/var/lib/site-builder/${SITE_DOMAIN}/repo"
-    cd "/var/lib/site-builder/${SITE_DOMAIN}/repo"
+    echo "Cloning fresh repository..."
+    rm -rf "${REPO_DIR}"
+    git -c safe.directory='*' clone "${GIT_REPO}" "${REPO_DIR}"
+    needs_rebuild=1
 fi
+
+cd "${REPO_DIR}"
 
 # Get new HEAD
 new_rev=$(git rev-parse HEAD)
 
-needs_rebuild=0
-
-# Check if rebuild is needed
+# Check if git revision changed
 if [ "$old_rev" != "$new_rev" ]; then
     echo "Git revision changed from $old_rev to $new_rev"
     needs_rebuild=1
 fi
 
+# Check if web directory is empty
 if [ ! -d "/var/www/${SITE_DOMAIN}" ] || [ -z "$(ls -A "/var/www/${SITE_DOMAIN}" 2>/dev/null)" ]; then
     echo "Web directory is empty"
     needs_rebuild=1
@@ -51,21 +56,18 @@ fi
 
 if [ $needs_rebuild -eq 1 ]; then
     echo "Changes detected - rebuilding..."
-    export HOME="/var/lib/site-builder/${SITE_DOMAIN}"
 
     # Build the site using nix-build if a default.nix exists
     if [ -f "default.nix" ]; then
         echo "Building with nix-build..."
         latest_build=$(nix-build --no-out-link)
 
-        # Clear the existing site and copy the new one
+        # Deploy to web directory
         rm -rf "/var/www/${SITE_DOMAIN:?}"/*
         cp -r "${latest_build}"/* "/var/www/${SITE_DOMAIN}/"
     else
         echo "No default.nix found, copying files directly..."
-        # Clear the existing site
         rm -rf "/var/www/${SITE_DOMAIN:?}"/*
-        # Only copy visible files and directories, excluding .git
         cp -r [^.]* "/var/www/${SITE_DOMAIN}/"
     fi
 

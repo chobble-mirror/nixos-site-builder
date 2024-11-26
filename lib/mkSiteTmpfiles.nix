@@ -9,6 +9,7 @@ let
     in [
       "d /var/lib/${serviceUser} 0755 ${serviceUser} ${serviceUser}"
       "d /var/www/${domain} 0755 ${serviceUser} ${serviceUser}"
+      "Z /var/www/${domain} 0755 ${serviceUser} ${serviceUser}"
     ];
 in
 builtins.foldl' (acc: domain:

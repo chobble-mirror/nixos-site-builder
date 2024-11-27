@@ -11,8 +11,8 @@ SERVICE_USER="${SANITIZED_DOMAIN}-builder"
 
 # Ensure we're running as the correct user
 if [ "$(id -un)" != "${SERVICE_USER}" ]; then
-    echo "This script must be run as ${SERVICE_USER}"
-    exit 1
+  echo "This script must be run as ${SERVICE_USER}"
+  exit 1
 fi
 
 echo "Starting site builder for ${SITE_DOMAIN}"
@@ -27,24 +27,24 @@ old_rev=""
 
 # Try to use existing repo if it exists and is valid
 if [ -d "${REPO_DIR}/.git" ]; then
-    echo "Found existing repository, attempting to update..."
-    cd "${REPO_DIR}"
-    old_rev=$(git rev-parse HEAD)
+  echo "Found existing repository, attempting to update..."
+  cd "${REPO_DIR}"
+  old_rev=$(git rev-parse HEAD)
 
-    if git fetch origin; then
-        git reset --hard origin/master
-        git clean -fdx
-    else
-        echo "Update failed, falling back to fresh clone"
-        rm -rf "${REPO_DIR}"
-        git -c safe.directory='*' clone "${GIT_REPO}" "${REPO_DIR}"
-        needs_rebuild=1
-    fi
-else
-    echo "Cloning fresh repository..."
+  if git fetch origin; then
+    git reset --hard origin/master
+    git clean -fdx
+  else
+    echo "Update failed, falling back to fresh clone"
     rm -rf "${REPO_DIR}"
     git -c safe.directory='*' clone "${GIT_REPO}" "${REPO_DIR}"
     needs_rebuild=1
+  fi
+else
+  echo "Cloning fresh repository..."
+  rm -rf "${REPO_DIR}"
+  git -c safe.directory='*' clone "${GIT_REPO}" "${REPO_DIR}"
+  needs_rebuild=1
 fi
 
 cd "${REPO_DIR}"
@@ -54,40 +54,33 @@ new_rev=$(git rev-parse HEAD)
 
 # Check if git revision changed
 if [ "$old_rev" != "$new_rev" ]; then
-    echo "Git revision changed from $old_rev to $new_rev"
-    needs_rebuild=1
+  echo "Git revision changed from $old_rev to $new_rev"
+  needs_rebuild=1
 fi
 
 # Check if web directory is empty
 if [ ! -d "/var/www/${SITE_DOMAIN}" ] || [ -z "$(ls -A "/var/www/${SITE_DOMAIN}" 2>/dev/null)" ]; then
-    echo "Web directory is empty"
-    needs_rebuild=1
+  echo "Web directory is empty"
+  needs_rebuild=1
 fi
 
 if [ $needs_rebuild -eq 1 ]; then
-    echo "Changes detected - rebuilding..."
+  echo "Changes detected - rebuilding..."
 
-    # Build the site using nix-build if a default.nix exists
-    if [ -f "default.nix" ]; then
-      echo "Building with nix-build..."
-      latest_build=$(nix-build --no-out-link)
+  chmod -R u+w "/var/www/${SITE_DOMAIN:?}"
+  rm -rf "/var/www/${SITE_DOMAIN:?}"/*
 
-      # Deploy to web directory
-      echo "Current user: $(id)"
-      echo "Permissions of web directory: $(ls -la /var/www/${SITE_DOMAIN})"
-      echo "Attempting to remove files..."
-      rm -rf "/var/www/${SITE_DOMAIN:?}"/*
-      cp -r "${latest_build}"/* "/var/www/${SITE_DOMAIN}/"
-    else
-      echo "No default.nix found, copying files directly..."
-      echo "Current user: $(id)"
-      echo "Permissions of web directory: $(ls -la /var/www/${SITE_DOMAIN})"
-      echo "Attempting to remove files..."
-      rm -rf "/var/www/${SITE_DOMAIN:?}"/*
-      cp -r [^.]* "/var/www/${SITE_DOMAIN}/"
-    fi
+  # Build the site using nix-build if a default.nix exists
+  if [ -f "default.nix" ]; then
+    echo "Building with nix-build..."
+    latest_build=$(nix-build --no-out-link)
+    cp -r "${latest_build}"/* "/var/www/${SITE_DOMAIN}/"
+  else
+    echo "No default.nix found, copying files directly..."
+    cp -r [^.]* "/var/www/${SITE_DOMAIN}/"
+  fi
 
-    echo "Site deployment complete"
+  echo "Site deployment complete"
 else
-    echo "No changes detected, not rebuilding"
+  echo "No changes detected, not rebuilding"
 fi

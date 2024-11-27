@@ -2,5 +2,5 @@
 
 {
   basicSite = pkgs.nixosTest (import ./basic-site.nix { inherit pkgs lib; });
-  # Add more integration tests here
+  multipleSites = pkgs.nixosTest (import ./multiple-sites.nix { inherit pkgs lib; });
 }

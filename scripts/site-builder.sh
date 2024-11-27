@@ -28,6 +28,7 @@ if [ -d "${REPO_DIR}/.git" ]; then
   echo "Found existing repository, attempting to update..."
   cd "${REPO_DIR}"
   old_rev=$(git rev-parse HEAD)
+  git fetch origin
   git reset --hard origin/master
   git clean -fdx
 else

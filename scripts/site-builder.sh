@@ -5,6 +5,16 @@ set -euo pipefail
 # SITE_DOMAIN - domain of the site (e.g., example.com)
 # GIT_REPO - git repository URL
 
+# Convert domain to service user name
+SANITIZED_DOMAIN=$(echo "${SITE_DOMAIN}" | tr '.' '-')
+SERVICE_USER="${SANITIZED_DOMAIN}-builder"
+
+# Ensure we're running as the correct user
+if [ "$(id -un)" != "${SERVICE_USER}" ]; then
+    echo "This script must be run as ${SERVICE_USER}"
+    exit 1
+fi
+
 echo "Starting site builder for ${SITE_DOMAIN}"
 echo "Git repo: ${GIT_REPO}"
 
@@ -59,16 +69,16 @@ if [ $needs_rebuild -eq 1 ]; then
 
     # Build the site using nix-build if a default.nix exists
     if [ -f "default.nix" ]; then
-        echo "Building with nix-build..."
-        latest_build=$(nix-build --no-out-link)
+      echo "Building with nix-build..."
+      latest_build=$(nix-build --no-out-link)
 
-        # Deploy to web directory
-        rm -rf "/var/www/${SITE_DOMAIN:?}"/*
-        cp -r "${latest_build}"/* "/var/www/${SITE_DOMAIN}/"
+      # Deploy to web directory
+      rm -rf "/var/www/${SITE_DOMAIN:?}"/*
+      cp -r "${latest_build}"/* "/var/www/${SITE_DOMAIN}/"
     else
-        echo "No default.nix found, copying files directly..."
-        rm -rf "/var/www/${SITE_DOMAIN:?}"/*
-        cp -r [^.]* "/var/www/${SITE_DOMAIN}/"
+      echo "No default.nix found, copying files directly..."
+      rm -rf "/var/www/${SITE_DOMAIN:?}"/*
+      cp -r [^.]* "/var/www/${SITE_DOMAIN}/"
     fi
 
     echo "Site deployment complete"

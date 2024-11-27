@@ -73,10 +73,16 @@ if [ $needs_rebuild -eq 1 ]; then
       latest_build=$(nix-build --no-out-link)
 
       # Deploy to web directory
+      echo "Current user: $(id)"
+      echo "Permissions of web directory: $(ls -la /var/www/${SITE_DOMAIN})"
+      echo "Attempting to remove files..."
       rm -rf "/var/www/${SITE_DOMAIN:?}"/*
       cp -r "${latest_build}"/* "/var/www/${SITE_DOMAIN}/"
     else
       echo "No default.nix found, copying files directly..."
+      echo "Current user: $(id)"
+      echo "Permissions of web directory: $(ls -la /var/www/${SITE_DOMAIN})"
+      echo "Attempting to remove files..."
       rm -rf "/var/www/${SITE_DOMAIN:?}"/*
       cp -r [^.]* "/var/www/${SITE_DOMAIN}/"
     fi

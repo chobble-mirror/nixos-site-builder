@@ -23,8 +23,8 @@ and then add it as a module to your server's host, like:
     sites = {
       "chobble.com" = {
         gitRepo = "http://localhost:3000/chobble/chobble";
-          wwwRedirect = true;
-        };
+        wwwRedirect = true;
+      };
       "veganprestwich.co.uk" = {
         gitRepo = "http://localhost:3000/chobble/vegan-prestwich";
         wwwRedirect = true;

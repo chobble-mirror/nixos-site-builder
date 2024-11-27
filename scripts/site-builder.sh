@@ -18,7 +18,7 @@ fi
 echo "Starting site builder for ${SITE_DOMAIN}"
 echo "Git repo: ${GIT_REPO}"
 
-REPO_DIR="/var/tmp/site-builder-${SITE_DOMAIN}"
+REPO_DIR="/var/lib/${SERVICE_USER}/site-builder-${SITE_DOMAIN}"
 
 needs_rebuild=0
 old_rev=""

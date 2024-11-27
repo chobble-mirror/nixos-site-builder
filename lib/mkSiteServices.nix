@@ -22,7 +22,6 @@ let
           GIT_REPO = cfg.gitRepo;
           SERVICE_USER = serviceUser;
           WWW_DIR = "/var/www/${domain}";
-          WORK_DIR = "/var/lib/${serviceUser}";
         };
 
         script = "site-builder";

@@ -19,8 +19,6 @@ echo "Starting site builder for ${SITE_DOMAIN}"
 echo "Git repo: ${GIT_REPO}"
 
 REPO_DIR="/var/tmp/site-builder-${SITE_DOMAIN}"
-WORK_DIR=$(mktemp -d)
-trap 'rm -rf ${WORK_DIR}' EXIT
 
 needs_rebuild=0
 old_rev=""
@@ -30,16 +28,8 @@ if [ -d "${REPO_DIR}/.git" ]; then
   echo "Found existing repository, attempting to update..."
   cd "${REPO_DIR}"
   old_rev=$(git rev-parse HEAD)
-
-  if git fetch origin; then
-    git reset --hard origin/master
-    git clean -fdx
-  else
-    echo "Update failed, falling back to fresh clone"
-    rm -rf "${REPO_DIR}"
-    git -c safe.directory='*' clone "${GIT_REPO}" "${REPO_DIR}"
-    needs_rebuild=1
-  fi
+  git reset --hard origin/master
+  git clean -fdx
 else
   echo "Cloning fresh repository..."
   rm -rf "${REPO_DIR}"

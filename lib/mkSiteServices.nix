@@ -1,6 +1,6 @@
 { pkgs }:
 
-sites: siteBuilder:
+sites: siteBuilders:
 let
   mkService = domain: cfg:
     let
@@ -14,17 +14,15 @@ let
           curl
           git
           nix
-          siteBuilder
         ];
         environment = {
           NIX_PATH = "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:/nix/var/nix/profiles/per-user/root/channels";
           SITE_DOMAIN = domain;
           GIT_REPO = cfg.gitRepo;
           SERVICE_USER = serviceUser;
-          WWW_DIR = "/var/www/${domain}";
         };
 
-        script = "site-builder";
+        script = "${siteBuilders.${domain}}/bin/site-builder-${domain}";
 
         serviceConfig = {
           CapabilityBoundingSet = "";

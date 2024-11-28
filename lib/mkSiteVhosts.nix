@@ -13,7 +13,7 @@ let
         file_server
 
         handle_errors {
-          rewrite * /not_found.html
+          rewrite * /{err.status_code}.html
           file_server
         }
 

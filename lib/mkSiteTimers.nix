@@ -9,7 +9,7 @@ let
       "${sanitizedDomain}-builder" = {
         wantedBy = [ "timers.target" ];
         timerConfig = {
-          OnBootSec = "1min";
+          OnBootSec = "5min";
           OnUnitActiveSec = "5min";
         };
       };

@@ -12,6 +12,11 @@ let
         root * /var/www/${domain}
         file_server
 
+        handle_errors {
+          rewrite * /not_found.html
+          file_server
+        }
+
         @static {
           path_regexp \.(ico|css|js|gif|jpg|jpeg|png|svg|webp|woff)$
         }

@@ -10,7 +10,7 @@ let
         wantedBy = [ "timers.target" ];
         timerConfig = {
           OnBootSec = "1min";
-          OnUnitActiveSec = "1h";
+          OnUnitActiveSec = "5min";
         };
       };
     };

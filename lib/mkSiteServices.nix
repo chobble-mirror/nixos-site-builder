@@ -1,11 +1,14 @@
-{ pkgs }:
+{ pkgs, mkSiteBuilder ? import ./mkSiteBuilder.nix { inherit pkgs; } }:
 
-sites: siteBuilders:
+sites:
 let
+  mkSiteBuilder = import ./mkSiteBuilder.nix { inherit pkgs; };
+
   mkService = domain: cfg:
     let
       sanitizedDomain = builtins.replaceStrings ["."] ["-"] domain;
       serviceUser = "${sanitizedDomain}-builder";
+      siteBuilder = mkSiteBuilder domain cfg;
     in {
       "${sanitizedDomain}-builder" = {
         description = "Build ${domain} website";
@@ -22,7 +25,7 @@ let
           SERVICE_USER = serviceUser;
         };
 
-        script = "${siteBuilders.${domain}}/bin/site-builder-${domain}";
+        script = "${siteBuilder}/bin/site-builder-${domain}";
 
         serviceConfig = {
           CapabilityBoundingSet = "";

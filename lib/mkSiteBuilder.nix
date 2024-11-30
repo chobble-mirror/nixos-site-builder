@@ -2,8 +2,11 @@
 
 domain: site:
 let
+  shortHash = str:
+    builtins.substring 0 8 (builtins.hashString "sha256" str);
+
   sanitizedDomain = builtins.replaceStrings ["."] ["-"] domain;
-  serviceUser = "${sanitizedDomain}-builder";
+  serviceUser = "site-${shortHash domain}-builder";
   deployCommand = if site.host == "neocities" then
     if site ? dryRun && site.dryRun then ''
       echo "[DRY RUN] Would push to Neocities now"

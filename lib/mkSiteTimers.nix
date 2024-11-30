@@ -2,11 +2,14 @@
 
 sites:
 let
+  shortHash = domain:
+    builtins.substring 0 8 (builtins.hashString "sha256" domain);
+
   mkTimer = domain: cfg:
     let
-      sanitizedDomain = builtins.replaceStrings ["."] ["-"] domain;
+      serviceUser = "site-${shortHash domain}-builder";
     in {
-      "${sanitizedDomain}-builder" = {
+      "${serviceUser}" = {
         wantedBy = [ "timers.target" ];
         timerConfig = {
           OnBootSec = "5min";

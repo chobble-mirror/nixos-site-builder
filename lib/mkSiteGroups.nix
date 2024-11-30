@@ -2,10 +2,15 @@
 
 sites:
 let
+  # Function to create a shortened hash of a string
+  shortHash = str:
+    builtins.substring 0 8 (builtins.hashString "sha256" str);
+
   mkGroup = domain: cfg:
     let
       sanitizedDomain = builtins.replaceStrings ["."] ["-"] domain;
-      serviceUser = "${sanitizedDomain}-builder";
+      # Use format: "site-{hash}-builder" (max 23 chars)
+      serviceUser = "site-${shortHash domain}-builder";
     in {
       ${serviceUser} = {};
     };

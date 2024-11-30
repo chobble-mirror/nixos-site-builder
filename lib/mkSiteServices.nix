@@ -4,13 +4,16 @@ sites:
 let
   mkSiteBuilder = import ./mkSiteBuilder.nix { inherit pkgs; };
 
+  shortHash = domain:
+    builtins.substring 0 8 (builtins.hashString "sha256" domain);
+
   mkService = domain: cfg:
     let
       sanitizedDomain = builtins.replaceStrings ["."] ["-"] domain;
-      serviceUser = "${sanitizedDomain}-builder";
+      serviceUser = "site-${shortHash domain}-builder";
       siteBuilder = mkSiteBuilder domain cfg;
     in {
-      "${sanitizedDomain}-builder" = {
+      "${serviceUser}" = {
         description = "Build ${domain} website";
         path = with pkgs; [
           bash

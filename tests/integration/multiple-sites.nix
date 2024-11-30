@@ -1,4 +1,3 @@
-# tests/integration/multiple-sites.nix
 { pkgs, lib }:
 
 with import ./lib.nix { inherit pkgs lib; };
@@ -66,12 +65,19 @@ in {
     start_all()
     machine.wait_for_unit("multi-user.target")
 
+    first_service = "site-" + machine.succeed(
+      "echo -n first.test | sha256sum | cut -c1-8"
+    ).strip() + "-builder"
+    second_service = "site-" + machine.succeed(
+      "echo -n second.test | sha256sum | cut -c1-8"
+    ).strip() + "-builder"
+
     # Test services
-    machine.succeed("systemctl start first-test-builder.service")
-    machine.succeed("systemctl start second-test-builder.service")
+    machine.succeed(f"systemctl start {first_service}.service")
+    machine.succeed(f"systemctl start {second_service}.service")
     machine.succeed("systemctl is-system-running --wait")
-    machine.succeed("systemctl is-active first-test-builder.service || [ $? -eq 3 ]")
-    machine.succeed("systemctl is-active second-test-builder.service || [ $? -eq 3 ]")
+    machine.succeed(f"systemctl is-active {first_service}.service || [ $? -eq 3 ]")
+    machine.succeed(f"systemctl is-active {second_service}.service || [ $? -eq 3 ]")
 
     # Test Caddy
     machine.wait_for_unit("caddy.service")

@@ -1,4 +1,3 @@
-# tests/integration/neocities-site.nix
 { pkgs, lib }:
 
 with import ./lib.nix { inherit pkgs lib; };
@@ -51,12 +50,18 @@ in {
     start_all()
     machine.wait_for_unit("multi-user.target")
 
+    # Get service name
+    service_name = "site-" + machine.succeed(
+      "echo -n neocities.test | sha256sum | cut -c1-8"
+    ).strip() + "-builder"
+
     # Get the service unit file content
-    unit_file = machine.succeed("systemctl cat neocities-test-builder.service")
+    unit_file = machine.succeed(f"systemctl cat {service_name}.service")
 
     # Basic service checks
+    # Basic service checks
     assert "Type=oneshot" in unit_file, "Incorrect service type"
-    assert "neocities-test-builder" in unit_file, "Service name not found"
+    assert service_name in unit_file, "Service name not found"
 
     # Check that the www directory exists
     machine.succeed("test -d /var/www/neocities.test")
@@ -66,7 +71,7 @@ in {
     machine.fail("test -f /etc/caddy/Caddyfile")
 
     # Start the builder service and wait for it to complete
-    machine.succeed("systemctl start neocities-test-builder.service")
+    machine.succeed(f"systemctl start {service_name}.service")
 
     # Verify the site files are built
     machine.succeed("test -f /var/www/neocities.test/index.html")

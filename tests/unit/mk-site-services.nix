@@ -5,6 +5,9 @@ let
   siteLib = import ../../lib { inherit pkgs; };
   inherit (siteLib) mkSiteServices;
 
+  shortHash = domain:
+    builtins.substring 0 8 (builtins.hashString "sha256" domain);
+
   testSites = {
     "example.com" = {
       gitRepo = "https://github.com/example/site.git";
@@ -15,6 +18,7 @@ let
     };
   };
 
+  serviceUser = "site-${shortHash "example.com"}-builder";
   result = mkSiteServices testSites;
 
   normalizeService = service:
@@ -33,14 +37,14 @@ let
 
   normalizedResult = lib.mapAttrs (name: normalizeService) result;
   expectedService = {
-    "example-com-builder" = {
+    ${serviceUser} = {
       description = "Build example.com website";
       path = with pkgs; [ bash curl git nix ];
       environment = {
         NIX_PATH = "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:/nix/var/nix/profiles/per-user/root/channels";
         SITE_DOMAIN = "example.com";
         GIT_REPO = "https://github.com/example/site.git";
-        SERVICE_USER = "example-com-builder";
+        SERVICE_USER = serviceUser;
       };
       serviceConfig = {
         CapabilityBoundingSet = "";
@@ -55,7 +59,7 @@ let
         ProtectKernelTunables = true;
         ProtectSystem = "strict";
         ReadWritePaths = [
-          "/var/lib/example-com-builder"
+          "/var/lib/${serviceUser}"
           "/var/www/example.com"
         ];
         BindReadOnlyPaths = [
@@ -67,8 +71,8 @@ let
         RestrictNamespaces = true;
         RestrictRealtime = true;
         Type = "oneshot";
-        User = "example-com-builder";
-        Group = "example-com-builder";
+        User = serviceUser;
+        Group = serviceUser;
       };
     };
   };
@@ -88,7 +92,7 @@ in
 pkgs.runCommand "test-mk-site-services" {
   buildInputs = [ pkgs.jq pkgs.diffutils ];
   inherit resultJson expectedJson;
-  inherit (result."example-com-builder") script;
+  inherit (result.${serviceUser}) script;
 } ''
   # Compare the JSON structures
   if ! diff -u \

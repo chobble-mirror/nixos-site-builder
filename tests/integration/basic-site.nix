@@ -9,6 +9,13 @@ let
     content = "<h1>Basic Test Site</h1>";
   };
   testRepoPath = testLib.mkTestRepo testSite;
+
+  # Add the hash function
+  shortHash = domain:
+    builtins.substring 0 8 (builtins.hashString "sha256" domain);
+
+  # Pre-compute the service name for "example.test"
+  serviceUser = "site-${shortHash "example.test"}-builder";
 in {
   name = "site-builder-basic";
 
@@ -49,9 +56,9 @@ in {
     machine.wait_for_unit("multi-user.target")
 
     # Test service
-    machine.succeed("systemctl start example-test-builder.service")
+    machine.succeed("systemctl start ${serviceUser}.service")
     machine.succeed("systemctl is-system-running --wait")
-    machine.succeed("systemctl is-active example-test-builder.service || [ $? -eq 3 ]")
+    machine.succeed("systemctl is-active ${serviceUser}.service || [ $? -eq 3 ]")
 
     # Test Caddy
     machine.wait_for_unit("caddy.service")

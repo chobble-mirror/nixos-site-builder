@@ -10,9 +10,12 @@ let
     };
   };
 
+  shortHash = domain:
+    builtins.substring 0 8 (builtins.hashString "sha256" domain);
+
   result = mkSiteGroups testSites;
   expected = {
-    "example-com-builder" = {};
+    "site-${shortHash "example.com"}-builder" = {};
   };
 in
 pkgs.runCommand "test-mk-site-groups" {} ''

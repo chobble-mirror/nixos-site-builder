@@ -1,4 +1,3 @@
-# tests/integration/lib.nix
 { pkgs, lib }:
 {
   # Helper to create a test site with specific content

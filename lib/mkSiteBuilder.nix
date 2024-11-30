@@ -1,9 +1,8 @@
-{ pkgs }:
+{ pkgs, utils }:
 
 domain: site:
 let
-  shortHash = str:
-    builtins.substring 0 8 (builtins.hashString "sha256" str);
+  inherit (utils) shortHash;
 
   sanitizedDomain = builtins.replaceStrings ["."] ["-"] domain;
   serviceUser = "site-${shortHash domain}-builder";

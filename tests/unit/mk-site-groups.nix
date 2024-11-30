@@ -1,7 +1,7 @@
-{ pkgs, lib }:
+{ pkgs, lib, utils }:
 
 let
-  mkSiteGroups = import ../../lib/mkSiteGroups.nix { inherit pkgs; };
+  mkSiteGroups = import ../../lib/mkSiteGroups.nix { inherit pkgs utils; };
 
   testSites = {
     "example.com" = {

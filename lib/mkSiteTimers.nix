@@ -1,10 +1,8 @@
-{ pkgs }:
+{ pkgs, utils }:
 
 sites:
 let
-  shortHash = domain:
-    builtins.substring 0 8 (builtins.hashString "sha256" domain);
-
+  inherit (utils) shortHash;
   mkTimer = domain: cfg:
     let
       serviceUser = "site-${shortHash domain}-builder";

@@ -1,7 +1,7 @@
-{ pkgs, lib }:
+{ pkgs, lib, utils }:
 
 let
-  mkSiteCommands = import ../../lib/mkSiteCommands.nix { inherit pkgs; };
+  mkSiteCommands = import ../../lib/mkSiteCommands.nix { inherit pkgs utils; };
 
   testSites = {
     "example.com" = {

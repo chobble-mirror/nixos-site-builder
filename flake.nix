@@ -16,7 +16,8 @@
       checks = forAllSystems (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-        in import ./tests { inherit pkgs; }
+          utils = import ./lib/utils.nix;
+        in import ./tests { inherit pkgs utils; }
       );
 
       # Convenience apps for running specific test suites

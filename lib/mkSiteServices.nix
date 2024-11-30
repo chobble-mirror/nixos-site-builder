@@ -1,11 +1,8 @@
-{ pkgs, mkSiteBuilder ? import ./mkSiteBuilder.nix { inherit pkgs; } }:
+{ pkgs, utils, mkSiteBuilder ? import ./mkSiteBuilder.nix { inherit pkgs utils; } }:
 
 sites:
 let
-  mkSiteBuilder = import ./mkSiteBuilder.nix { inherit pkgs; };
-
-  shortHash = domain:
-    builtins.substring 0 8 (builtins.hashString "sha256" domain);
+  inherit (utils) shortHash;
 
   mkService = domain: cfg:
     let

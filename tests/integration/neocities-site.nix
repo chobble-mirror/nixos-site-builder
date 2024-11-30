@@ -1,4 +1,4 @@
-{ pkgs, lib }:
+{ pkgs, lib, utils }:
 
 with import ./lib.nix { inherit pkgs lib; };
 

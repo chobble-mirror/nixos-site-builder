@@ -1,7 +1,7 @@
-{ pkgs, lib }:
+{ pkgs, lib, utils }:
 
 let
-  runTest = name: test: pkgs.callPackage test { inherit lib; };
+  runTest = name: test: pkgs.callPackage test { inherit lib utils; };
 in {
   mkSiteGroups = runTest "mkSiteGroups" (import ./mk-site-groups.nix);
   mkSiteServices = runTest "mkSiteServices" (import ./mk-site-services.nix);

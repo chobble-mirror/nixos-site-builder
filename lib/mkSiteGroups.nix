@@ -1,10 +1,8 @@
-{ pkgs }:
+{ pkgs, utils }:
 
 sites:
 let
-  # Function to create a shortened hash of a string
-  shortHash = str:
-    builtins.substring 0 8 (builtins.hashString "sha256" str);
+  inherit (utils) shortHash;
 
   mkGroup = domain: cfg:
     let

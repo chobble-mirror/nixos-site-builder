@@ -1,4 +1,4 @@
-{ pkgs, lib }:
+{ pkgs, lib, utils }:
 
 let
   # Import the actual implementation

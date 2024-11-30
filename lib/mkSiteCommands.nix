@@ -1,9 +1,8 @@
-{ pkgs }:
+{ pkgs, utils }:
 
 sites:
 let
-  shortHash = domain:
-    builtins.substring 0 8 (builtins.hashString "sha256" domain);
+  inherit (utils) shortHash;
 
   # Create a mapping of domains to service IDs
   domainMap = builtins.foldl' (acc: domain:

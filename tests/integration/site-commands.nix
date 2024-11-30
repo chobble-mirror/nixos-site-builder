@@ -1,4 +1,4 @@
-{ pkgs, lib }:
+{ pkgs, lib, utils }:
 
 with import ./lib.nix { inherit pkgs lib; };
 
@@ -15,7 +15,7 @@ let
 
   serviceUser = "site-${shortHash "example.test"}-builder";
 
-  siteCommand = import ../../lib/mkSiteCommands.nix { inherit pkgs; } {
+  siteCommand = import ../../lib/mkSiteCommands.nix { inherit pkgs utils; } {
     "example.test" = {
       gitRepo = "file://${testRepoPath}";
       wwwRedirect = false;

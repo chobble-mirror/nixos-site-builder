@@ -1,9 +1,8 @@
-{ pkgs }:
+{ pkgs, utils }:
 
 sites:
 let
-  shortHash = domain:
-    builtins.substring 0 8 (builtins.hashString "sha256" domain);
+  inherit (utils) shortHash;
 
   mkTmpfiles = domain: cfg:
     let

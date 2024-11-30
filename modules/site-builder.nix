@@ -81,6 +81,10 @@ in {
         description = mdDoc "Whether to enable and configure Caddy web server";
       };
     };
+
+    environment.systemPackages = [
+      (siteLib.mkSiteCommands cfg.sites)
+    ];
   };
 
   config = mkIf cfg.enable {

@@ -7,6 +7,8 @@ let
 
   sanitizedDomain = builtins.replaceStrings ["."] ["-"] domain;
   serviceUser = "site-${shortHash domain}-builder";
+  serviceId = shortHash domain;
+
   deployCommand = if site.host == "neocities" then
     if site ? dryRun && site.dryRun then ''
       echo "[DRY RUN] Would push to Neocities now"
@@ -99,6 +101,13 @@ pkgs.writeShellApplication {
         echo "No default.nix found, copying files directly..."
         cp -r ./* "$www_dir/" || fail "Failed to copy files"
       fi
+
+      # Create the .site-info file with service information
+      cat > "$www_dir/.site-info" <<EOF
+domain: ${domain}
+service: ${serviceUser}
+id: ${serviceId}
+EOF
 
       ${deployCommand}
 

@@ -4,6 +4,10 @@ sites:
 let
   mkVhost = domain: cfg:
     let
+      host = cfg.host or "caddy";
+    in
+    if host != "caddy" then {} else
+    let
       protocol = if cfg.useHTTPS then "https" else "http";
     in {
     "${protocol}://${domain}" = {

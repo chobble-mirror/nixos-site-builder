@@ -38,11 +38,19 @@ let
         default = null;
         description = "API key for the hosting service (if required)";
       };
+      dryRun = mkOption {
+        type = types.bool;
+        default = false;
+        description = "If true, skip actual deployment (useful for testing)";
+      };
     };
   };
 
   # Import the library functions
   siteLib = import ../lib { inherit pkgs; };
+
+  hasCaddySites = sites:
+    lib.any (cfg: (cfg.host or "caddy") == "caddy") (builtins.attrValues sites);
 
 in {
   options.services.site-builder = {
@@ -81,6 +89,10 @@ in {
         assertion = cfg.sites != {};
         message = "At least one site must be configured when site-builder is enabled";
       }
+      {
+        assertion = !hasCaddySites cfg.sites || cfg.caddy.enable;
+        message = "Caddy must be enabled when a site has host=\"caddy\"";
+      }
     ];
 
     systemd.services = siteLib.mkSiteServices cfg.sites;
@@ -89,7 +101,7 @@ in {
     users.groups = siteLib.mkSiteGroups cfg.sites;
     systemd.tmpfiles.rules = siteLib.mkSiteTmpfiles cfg.sites;
 
-    services.caddy = mkIf cfg.caddy.enable {
+    services.caddy = mkIf (cfg.caddy.enable && hasCaddySites cfg.sites) {
       enable = true;
       virtualHosts = siteLib.mkSiteVhosts cfg.sites;
     };

@@ -4,13 +4,17 @@ domain: site:
 let
   sanitizedDomain = builtins.replaceStrings ["."] ["-"] domain;
   serviceUser = "${sanitizedDomain}-builder";
-  deployCommand = if site.host == "neocities" then ''
-    echo "Deploying to Neocities..."
-    export NEOCITIES_API_KEY="${site.apiKey}"
-    ${pkgs.neocities-cli}/bin/neocities push --prune /var/www/${domain}
-  '' else ''
+  deployCommand = if site.host == "neocities" then
+    if site ? dryRun && site.dryRun then ''
+      echo "[DRY RUN] Would push to Neocities now"
+    '' else ''
+      echo "Pushing to Neocities"
+      export NEOCITIES_API_KEY="${site.apiKey}"
+      ${pkgs.neocities-cli}/bin/neocities push --prune /var/www/${domain}
+    ''
+  else ''
     # For Caddy, files are already in the correct place
-    echo "Files deployed for Caddy serving"
+    echo "Made /var/www/${sanitizedDomain} for Caddy serving"
   '';
 in
 pkgs.writeShellApplication {

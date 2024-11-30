@@ -9,19 +9,42 @@ let
       wwwRedirect = true;
       useHTTPS = false;
     };
+    "neocities.example" = {
+      gitRepo = "https://github.com/example/site.git";
+      wwwRedirect = false;
+      useHTTPS = false;
+      host = "neocities";
+      apiKey = "dummy-key";
+    };
+    "explicit-caddy.example" = {
+      gitRepo = "https://github.com/example/site.git";
+      wwwRedirect = false;
+      useHTTPS = false;
+      host = "caddy";
+    };
   };
 
   result = mkSiteVhosts testSites;
 
   tests = [
     {
-      name = "has-vhost";
+      name = "default-caddy-has-vhost";
       test = builtins.hasAttr "http://example.com" result;
       expected = true;
     }
     {
-      name = "has-www-redirect";
+      name = "default-caddy-has-www-redirect";
       test = builtins.hasAttr "http://www.example.com" result;
+      expected = true;
+    }
+    {
+      name = "neocities-no-vhost";
+      test = builtins.hasAttr "http://neocities.example" result;
+      expected = false;
+    }
+    {
+      name = "explicit-caddy-has-vhost";
+      test = builtins.hasAttr "http://explicit-caddy.example" result;
       expected = true;
     }
   ];

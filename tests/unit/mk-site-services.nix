@@ -4,9 +4,7 @@ let
   # Import the actual implementation
   siteLib = import ../../lib { inherit pkgs; };
   inherit (siteLib) mkSiteServices;
-
-  shortHash = domain:
-    builtins.substring 0 8 (builtins.hashString "sha256" domain);
+  inherit (utils) shortHash;
 
   testSites = {
     "example.com" = {

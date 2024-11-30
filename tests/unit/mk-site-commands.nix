@@ -13,10 +13,7 @@ let
       wwwRedirect = false;
     };
   };
-
-  shortHash = domain:
-    builtins.substring 0 8 (builtins.hashString "sha256" domain);
-
+  inherit (utils) shortHash;
   result = mkSiteCommands testSites;
 in
 pkgs.runCommand "test-mk-site-commands" {

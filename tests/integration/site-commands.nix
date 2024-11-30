@@ -9,10 +9,7 @@ let
     content = "<h1>Command Test Site</h1>";
   };
   testRepoPath = testLib.mkTestRepo testSite;
-
-  shortHash = domain:
-    builtins.substring 0 8 (builtins.hashString "sha256" domain);
-
+  inherit (utils) shortHash;
   serviceUser = "site-${shortHash "example.test"}-builder";
 
   siteCommand = import ../../lib/mkSiteCommands.nix { inherit pkgs utils; } {

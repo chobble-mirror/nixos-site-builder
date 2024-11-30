@@ -9,11 +9,7 @@ let
     content = "<h1>Basic Test Site</h1>";
   };
   testRepoPath = testLib.mkTestRepo testSite;
-
-  # Add the hash function
-  shortHash = domain:
-    builtins.substring 0 8 (builtins.hashString "sha256" domain);
-
+  inherit (utils) shortHash;
   # Pre-compute the service name for "example.test"
   serviceUser = "site-${shortHash "example.test"}-builder";
 in {

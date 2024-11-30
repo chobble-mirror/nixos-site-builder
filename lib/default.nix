@@ -8,4 +8,5 @@
   mkSiteTmpfiles = import ./mkSiteTmpfiles.nix { inherit pkgs; };
   mkSiteVhosts = import ./mkSiteVhosts.nix { inherit pkgs; };
   mkSiteBuilder = import ./mkSiteBuilder.nix { inherit pkgs; };
+  mkSiteCommands = import ./mkSiteCommands.nix { inherit pkgs; };
 }

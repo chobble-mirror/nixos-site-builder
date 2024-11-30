@@ -110,6 +110,8 @@ in {
       virtualHosts = siteLib.mkSiteVhosts cfg.sites;
     };
 
-    _module.args._mkSiteBuilder = mkSiteBuilder;
+    environment.systemPackages = [
+      (siteLib.mkSiteCommands cfg.sites)
+    ];
   };
 }

@@ -6,7 +6,6 @@ let
 
   mkService = domain: cfg:
     let
-      sanitizedDomain = builtins.replaceStrings ["."] ["-"] domain;
       serviceUser = "site-${shortHash domain}-builder";
       siteBuilder = mkSiteBuilder domain cfg;
     in {

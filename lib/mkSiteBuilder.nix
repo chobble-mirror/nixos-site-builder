@@ -4,7 +4,6 @@ domain: site:
 let
   inherit (utils) shortHash;
 
-  sanitizedDomain = builtins.replaceStrings ["."] ["-"] domain;
   serviceUser = "site-${shortHash domain}-builder";
   serviceId = shortHash domain;
 
@@ -18,7 +17,7 @@ let
     ''
   else ''
     # For Caddy, files are already in the correct place
-    echo "Made /var/www/${sanitizedDomain} for Caddy serving"
+    echo "Made /var/www/${domain} for Caddy serving"
   '';
 in
 pkgs.writeShellApplication {

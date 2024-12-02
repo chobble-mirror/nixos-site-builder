@@ -6,7 +6,6 @@ let
 
   mkTmpfiles = domain: cfg:
     let
-      sanitizedDomain = builtins.replaceStrings ["."] ["-"] domain;
       serviceUser = "site-${shortHash domain}-builder";
     in [
       "d /var/lib/${serviceUser} 0755 ${serviceUser} ${serviceUser}"

@@ -22,6 +22,20 @@ let
           file_server
         }
 
+        log {
+          output file /var/log/caddy/access-${domain}.log {
+            roll_size 100mb
+            roll_keep 1
+            roll_keep_for 24h
+          }
+          format filter {
+			      request>headers>User-Agent delete
+						request>headers>Cookie delete
+						request>remote_ip ip_mask 16 32
+						request>client_ip ip_mask 16 32
+		      }
+        }
+
         @static {
           path_regexp \.(ico|css|js|gif|jpg|jpeg|png|svg|webp|woff)$
         }

@@ -94,6 +94,11 @@ pkgs.writeShellApplication {
       if [ -f "default.nix" ]; then
         echo "Building with nix-build..."
         latest_build=$(nix-build --no-out-link) || fail "nix-build failed"
+
+        if [ -z "$(ls -A "$latest_build" 2>/dev/null)" ]; then
+          fail "nix-build failed - directory is empty"
+        fi
+
         cp -r "$latest_build"/* "$www_dir/" || fail "Failed to copy build output"
       else
         echo "No default.nix found, copying files directly..."

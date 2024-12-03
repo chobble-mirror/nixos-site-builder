@@ -108,10 +108,10 @@ in {
     services.caddy = mkIf (cfg.caddy.enable && hasCaddySites cfg.sites) {
       enable = true;
       virtualHosts = siteLib.mkSiteVhosts cfg.sites;
-      package = pkgs.caddy.withPlugins {
-        plugins = [ "github.com/caddyserver/transform-encoder" ];
-        hash = "sha256-wrooonngg=";
-      };
+      # package = pkgs.caddy.withPlugins {
+      #   plugins = [ "github.com/caddyserver/transform-encoder" ];
+      #   hash = "sha256-wrooonngg=";
+      # };
     };
 
     environment.systemPackages = [

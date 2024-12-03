@@ -22,16 +22,6 @@ let
           file_server
         }
 
-        log {
-          output file "/var/log/caddy/access-${domain}.log" {
-            roll_keep_for 1d
-            roll_size 10MiB
-          }
-          format transform `{request>remote_ip} - {request>user_id} [{ts}] "{request>method} {request>uri} {request>proto}" {status} {size} "{request>headers>Referer>[0]}" "{request>headers>User-Agent>[0]}"` {
-            time_format "02/Jan/2006:15:04:05 -0700"
-          }
-        }
-
         @static {
           path_regexp \.(ico|css|js|gif|jpg|jpeg|png|svg|webp|woff)$
         }

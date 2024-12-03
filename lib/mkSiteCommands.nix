@@ -60,7 +60,7 @@ let
           exit 1
         fi
         if [ "$command" = "status" ]; then
-          systemctl status "''${services[$domain]}"
+          systemctl status -n 30 --no-pager -l "''${services[$domain]}"
         else
           systemctl restart "''${services[$domain]}"
         fi

@@ -87,22 +87,23 @@ pkgs.writeShellApplication {
         fail "www_dir is not set!"
       fi
 
-      chmod -R u+w "$www_dir" || fail "Failed to set write permissions"
-      find "$www_dir" -mindepth 1 -delete || fail "Failed to clean www directory"
-
+      source_dir=""
       # Build the site using nix-build if a default.nix exists
       if [ -f "default.nix" ]; then
         echo "Building with nix-build..."
-        latest_build=$(nix-build --no-out-link) || fail "nix-build failed"
-
-        if [ -z "$(ls -A "$latest_build" 2>/dev/null)" ]; then
-          fail "nix-build failed - directory is empty"
-        fi
-
-        cp -r "$latest_build"/* "$www_dir/" || fail "Failed to copy build output"
+        source_dir=$(nix-build --no-out-link) || fail "nix-build failed"
       else
         echo "No default.nix found, copying files directly..."
-        cp -r ./* "$www_dir/" || fail "Failed to copy files"
+        source_dir="."
+      fi
+
+      chmod -R u+w "$www_dir" || fail "Failed to set write permissions"
+      find "$www_dir" -mindepth 1 -delete || fail "Failed to clean www directory"
+
+      if [ -n "$(ls -A "$source_dir")" ]; then
+        cp -r "$source_dir"/* "$www_dir/" || fail "Failed to copy files"
+      else
+        fail "Source directory is empty"
       fi
 
       # Create the .site-info file with service information

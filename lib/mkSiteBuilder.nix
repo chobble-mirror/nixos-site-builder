@@ -91,7 +91,10 @@ pkgs.writeShellApplication {
       # Build the site using nix-build if a default.nix exists
       if [ -f "default.nix" ]; then
         echo "Building with nix-build..."
-        source_dir=$(nix-build --no-out-link) || fail "nix-build failed"
+        source_dir=$(nix build \
+          --no-link \
+          --print-out-paths
+        ) || fail "nix-build failed"
       else
         echo "No default.nix found, copying files directly..."
         source_dir="."

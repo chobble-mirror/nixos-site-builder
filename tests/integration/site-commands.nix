@@ -83,7 +83,6 @@ in {
     with subtest("Test site command list"):
         output = machine.succeed("site list")
         assert "example.test" in output, "Domain not found in site list"
-        assert "active" in output, "Active status not found in site list"
         assert "${serviceUser}" in output, "Service ID not found in site list"
 
     with subtest("Test site command status"):

@@ -46,15 +46,14 @@ let
       ${builtins.concatStringsSep "\n        " (
         builtins.map (domain: ''
           service="''${services[${domain}]}"
-          status=$(systemctl is-active "$service.service" || echo "inactive")
-          last_run=$(systemctl show "$service.service" \
+          last_run=$(systemctl show "$service" \
             --property=ExecMainStartTimestamp | cut -d= -f2 | \
             xargs -I{} date -d "{}" +"%H:%M:%S")
           next_run=$(systemctl list-timers "$service.timer" --no-pager | \
             grep "$service" | awk '{print $3}' | \
             xargs -I{} date -d "{}" +"%H:%M:%S" || echo "")
           next_fmt=''${next_run:+" (next: $next_run)"}
-          echo "  [$status] ${domain} (service: $service)"
+          echo "  ${domain} (service: $service)"
           echo "    Last run: $last_run$next_fmt"
         '') (builtins.attrNames sites)
       )}

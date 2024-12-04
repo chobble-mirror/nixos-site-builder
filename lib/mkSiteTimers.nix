@@ -21,7 +21,7 @@ let
         timerConfig = {
           OnBootSec = timerConfig.initialDelay;
           OnUnitActiveSec = "${toString timerConfig.interval.minutes}m";
-          RandomizedDelaySec = timerConfig.interval.seconds
+          RandomizedDelaySec = timerConfig.interval.seconds;
         };
       };
     };

@@ -24,16 +24,13 @@ let
         hashNum
         timerConfig.interval.seconds *
         timerConfig.interval.seconds);
-      minutes = builtins.toString (builtins.div offset 60 + 100);
-      seconds = builtins.toString (offset - (builtins.div offset 60 * 60) + 100);
-      paddedMinutes = builtins.substring 1 2 minutes;
-      paddedSeconds = builtins.substring 1 2 seconds;
     in {
       "${serviceUser}" = {
         wantedBy = [ "timers.target" ];
         timerConfig = {
           OnBootSec = timerConfig.initialDelay;
-          OnUnitActiveSec = "*:${paddedMinutes}:${paddedSeconds}";
+          OnUnitActiveSec = "${toString timerConfig.interval.minutes}m";
+          RandomizedDelaySec = toString offset;
         };
       };
     };

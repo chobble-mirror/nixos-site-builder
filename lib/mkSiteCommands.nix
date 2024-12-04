@@ -41,14 +41,23 @@ let
     )
 
     case "$command" in
-      "list")
-        echo "Managed sites:"
-        ${builtins.concatStringsSep "\n        " (
-          builtins.map (domain:
-            ''echo "  ${domain} (service: ''${services[${domain}]})"''
-          ) (builtins.attrNames sites)
-        )}
-        ;;
+    "list")
+      echo "Managed sites:"
+      ${builtins.concatStringsSep "\n        " (
+        builtins.map (domain: ''
+          status=$(systemctl is-active "''${services[${domain}]}" || echo "inactive")
+          last_run=$(systemctl show "''${services[${domain}]}" --property=ExecMainStartTimestamp | cut -d= -f2)
+          next_run=$(systemctl show "''${services[${domain}]}" --property=NextScheduledRealtimeUsec | cut -d= -f2)
+          if [ -n "$next_run" ]; then
+            next_run_fmt="(next: $next_run)"
+          else
+            next_run_fmt=""
+          fi
+          echo "  [$status] ${domain} (service: ''${services[${domain}]})"
+          echo "    Last run: $last_run $next_run_fmt"
+        '') (builtins.attrNames sites)
+      )}
+      ;;
       "status"|"restart")
         if [ -z "$domain" ]; then
           echo "Error: Domain is required"

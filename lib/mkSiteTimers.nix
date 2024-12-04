@@ -15,22 +15,13 @@ let
   mkTimer = domain: cfg:
     let
       serviceUser = "site-${shortHash domain}-builder";
-      hashString = builtins.hashString "sha256" domain;
-      hashNum = builtins.foldl'
-        (sum: c: sum + builtins.stringLength (toString c))
-        0
-        (builtins.split "" hashString);
-      offset = hashNum - (builtins.div
-        hashNum
-        timerConfig.interval.seconds *
-        timerConfig.interval.seconds);
     in {
       "${serviceUser}" = {
         wantedBy = [ "timers.target" ];
         timerConfig = {
           OnBootSec = timerConfig.initialDelay;
           OnUnitActiveSec = "${toString timerConfig.interval.minutes}m";
-          RandomizedDelaySec = toString offset;
+          RandomizedDelaySec = timerConfig.interval.seconds
         };
       };
     };

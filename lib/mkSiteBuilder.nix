@@ -2,9 +2,9 @@
 
 domain: site:
 let
-  inherit (utils) shortHash;
+  inherit (utils) shortHash mkServiceName;
 
-  serviceUser = "site-${shortHash domain}-builder";
+  serviceUser = mkServiceName domain;
   serviceId = shortHash domain;
 
   deployCommand = if site.host == "neocities" then

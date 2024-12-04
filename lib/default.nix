@@ -3,8 +3,6 @@ let
   utils = import ./utils.nix;
 in
 {
-  inherit (utils) shortHash;
-
   mkSiteServices = import ./mkSiteServices.nix { inherit pkgs utils; };
   mkSiteTimers = import ./mkSiteTimers.nix { inherit pkgs utils; };
   mkSiteUsers = import ./mkSiteUsers.nix { inherit pkgs utils; };

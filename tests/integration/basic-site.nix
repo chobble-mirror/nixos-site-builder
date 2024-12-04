@@ -9,9 +9,8 @@ let
     content = "<h1>Basic Test Site</h1>";
   };
   testRepoPath = testLib.mkTestRepo testSite;
-  inherit (utils) shortHash;
-  # Pre-compute the service name for "example.test"
-  serviceUser = "site-${shortHash "example.test"}-builder";
+  inherit (utils) mkServiceName;
+  serviceUser = mkServiceName "example.test";
 in {
   name = "site-builder-basic";
 

@@ -10,11 +10,11 @@ let
     };
   };
 
-  inherit (utils) shortHash;
+  inherit (utils) mkServiceName;
 
   result = mkSiteGroups testSites;
   expected = {
-    "site-${shortHash "example.com"}-builder" = {};
+    "${mkServiceName "example.com"}" = {};
   };
 in
 pkgs.runCommand "test-mk-site-groups" {} ''

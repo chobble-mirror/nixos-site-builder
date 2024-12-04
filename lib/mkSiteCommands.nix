@@ -2,11 +2,11 @@
 
 sites:
 let
-  inherit (utils) shortHash;
+  inherit (utils) mkServiceName;
 
   # Create a mapping of domains to service IDs
   domainMap = builtins.foldl' (acc: domain:
-    acc // { ${domain} = "site-${shortHash domain}-builder"; }
+    acc // { ${domain} = mkServiceName domain; }
   ) {} (builtins.attrNames sites);
 
   # Create the command script

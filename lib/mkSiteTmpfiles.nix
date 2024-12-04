@@ -2,11 +2,11 @@
 
 sites:
 let
-  inherit (utils) shortHash;
+  inherit (utils) mkServiceName;
 
   mkTmpfiles = domain: cfg:
     let
-      serviceUser = "site-${shortHash domain}-builder";
+      serviceUser = mkServiceName domain;
     in [
       "d /var/lib/${serviceUser} 0755 ${serviceUser} ${serviceUser}"
       "d /var/www/${domain} 0755 ${serviceUser} ${serviceUser}"

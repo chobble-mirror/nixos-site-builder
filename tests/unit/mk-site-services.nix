@@ -4,7 +4,7 @@ let
   # Import the actual implementation
   siteLib = import ../../lib { inherit pkgs; };
   inherit (siteLib) mkSiteServices;
-  inherit (utils) shortHash;
+  inherit (utils) mkServiceName;
 
   testSites = {
     "example.com" = {
@@ -16,7 +16,7 @@ let
     };
   };
 
-  serviceUser = "site-${shortHash "example.com"}-builder";
+  serviceUser = mkServiceName "example.com";
   result = mkSiteServices testSites;
 
   normalizeService = service:

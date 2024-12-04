@@ -13,7 +13,7 @@ let
       wwwRedirect = false;
     };
   };
-  inherit (utils) shortHash;
+  inherit (utils) mkServiceName;
   result = mkSiteCommands testSites;
 in
 pkgs.runCommand "test-mk-site-commands" {
@@ -45,7 +45,7 @@ pkgs.runCommand "test-mk-site-commands" {
   # Test list command
   run_test "list command" \
     "$script list" \
-    "example.com (service: site-${shortHash "example.com"}-builder)"
+    "example.com (service: ${mkServiceName "example.com"})"
 
   # Test invalid command
   run_test "invalid command" \

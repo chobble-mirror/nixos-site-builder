@@ -2,26 +2,17 @@
 
 sites:
 let
-  inherit (utils) shortHash;
-
-  timerConfig = rec {
-    interval = rec {
-      minutes = 5;
-      seconds = minutes * 60;
-    };
-    initialDelay = "5min";
-  };
-
+  inherit (utils) mkServiceName;
   mkTimer = domain: cfg:
     let
-      serviceUser = "site-${shortHash domain}-builder";
+      serviceUser = mkServiceName domain;
     in {
       "${serviceUser}" = {
         wantedBy = [ "timers.target" ];
         timerConfig = {
-          OnBootSec = timerConfig.initialDelay;
-          OnUnitActiveSec = "${toString timerConfig.interval.minutes}m";
-          RandomizedDelaySec = timerConfig.interval.seconds;
+          OnBootSec = "5m";
+          OnUnitActiveSec = "5m";
+          RandomizedDelaySec = "5m";
         };
       };
     };

@@ -1,7 +1,4 @@
 { pkgs, lib, utils }:
-
-with import ./lib.nix { inherit pkgs lib; };
-
 let
   testLib = import ./lib.nix { inherit pkgs lib; };
   testSite = testLib.mkTestSite {
@@ -9,8 +6,9 @@ let
     content = "<h1>Command Test Site</h1>";
   };
   testRepoPath = testLib.mkTestRepo testSite;
-  inherit (utils) shortHash;
-  serviceUser = "site-${shortHash "example.test"}-builder";
+
+  inherit (utils) mkServiceName shortHash;
+  serviceUser = mkServiceName "example.test";
 
   siteCommand = import ../../lib/mkSiteCommands.nix { inherit pkgs utils; } {
     "example.test" = {

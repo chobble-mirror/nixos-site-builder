@@ -2,11 +2,11 @@
 
 sites:
 let
-  inherit (utils) shortHash;
+  inherit (utils) mkServiceName;
 
   mkGroup = domain: cfg:
     let
-      serviceUser = "site-${shortHash domain}-builder";
+      serviceUser = mkServiceName domain;
     in {
       ${serviceUser} = {};
     };

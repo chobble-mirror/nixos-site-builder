@@ -15,7 +15,7 @@ let
       };
       branch = mkOption {
         type = types.str;
-        default = "master";
+        default = "main";
         description = "Git branch to track";
       };
       wwwRedirect = mkOption {

@@ -7,7 +7,6 @@ let
   serviceUser = mkServiceName domain;
   serviceId = shortHash domain;
 
-
   buildCommand = if site.builder or "nix" == "jekyll"
     then ''
       nix build --no-link git+https://git.chobble.com/chobble/nix-jekyll-builder#jekyllSite --override-input src . --print-out-paths

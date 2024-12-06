@@ -1,10 +1,13 @@
 { pkgs, lib, utils }:
 
 let
-  runTest = name: test: pkgs.callPackage test { inherit lib utils; };
-in {
-  mkSiteGroups = runTest "mkSiteGroups" (import ./mk-site-groups.nix);
-  mkSiteServices = runTest "mkSiteServices" (import ./mk-site-services.nix);
-  mkSiteVhosts = runTest "mkSiteVhosts" (import ./mk-site-vhosts.nix);
-  mkSiteCommands = runTest "mkSiteCommands" (import ./mk-site-commands.nix);
-}
+  tests = {
+    siteCommands = ./mk-site-commands.nix;
+    siteGroups = ./mk-site-groups.nix;
+    siteServices = ./mk-site-services.nix;
+    siteVhosts = ./mk-site-vhosts.nix;
+  };
+in
+builtins.mapAttrs (name: path:
+  import path { inherit pkgs lib utils; }
+) tests

@@ -1,8 +1,13 @@
 { pkgs, lib, utils }:
 
-{
-  basicSite = pkgs.nixosTest (import ./basic-site.nix { inherit pkgs lib utils; });
-  multipleSites = pkgs.nixosTest (import ./multiple-sites.nix { inherit pkgs lib utils; });
-  neocities = pkgs.nixosTest (import ./neocities-site.nix { inherit pkgs lib utils; });
-  siteCommands = pkgs.nixosTest (import ./site-commands.nix { inherit pkgs lib utils; });
-}
+let
+  tests = {
+    basic = ./basic-site.nix;
+    neocities = ./neocities-site.nix;
+    multiple = ./multiple-sites.nix;
+    commands = ./site-commands.nix;
+  };
+in
+builtins.mapAttrs (name: path:
+  pkgs.nixosTest (import path { inherit pkgs lib utils; })
+) tests

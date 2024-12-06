@@ -9,7 +9,10 @@ let
 
   buildCommand = if site.builder or "nix" == "jekyll"
     then ''
-      nix build --no-link git+https://git.chobble.com/chobble/nix-jekyll-builder#jekyllSite --override-input src . --print-out-paths
+      export NIX_USER_CONF_FILES="/var/lib/${serviceUser}/.config/nix/nix.conf"
+      export XDG_CACHE_HOME="/var/lib/${serviceUser}/.cache"
+      mkdir -p "$XDG_CACHE_HOME/nix/gitv3"
+      nix build --no-link git+https://git.chobble.com/chobble/nix-jekyll-builder?ref=main#jekyllSite --override-input src . --print-out-paths
     ''
     else ''
       if [ -f "default.nix" ]; then

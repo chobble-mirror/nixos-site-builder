@@ -83,6 +83,6 @@ in {
 
     # Original tests
     machine.succeed("test -f /var/www/jekyll.test/index.html")
-    machine.succeed("grep -q 'Jekyll Test Site' /tmp/jekyll.test-content")
+    machine.succeed("grep -q 'Jekyll Test Site' /var/www/jekyll.test/index.html")
   '';
 }

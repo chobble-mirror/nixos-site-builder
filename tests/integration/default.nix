@@ -3,6 +3,7 @@
 let
   tests = {
     basic = ./basic-site.nix;
+    jekyll = ./jekyll-site.nix;
     neocities = ./neocities-site.nix;
     multiple = ./multiple-sites.nix;
     commands = ./site-commands.nix;

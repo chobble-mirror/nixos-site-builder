@@ -18,6 +18,11 @@ let
         default = "main";
         description = "Git branch to track";
       };
+      builder = mkOption {
+        type = types.enum [ "nix" "jekyll" ];
+        default = "nix";
+        description = mdDoc "Site builder to use. Either 'nix' for nix-build or 'jekyll' for nix-jekyll-builder";
+      };
       wwwRedirect = mkOption {
         type = types.bool;
         default = false;

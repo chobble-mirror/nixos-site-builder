@@ -36,5 +36,5 @@ and then add it as a module to your server's host, like:
 
 My Git repos in this example are hosted on localhost by my Forgejo instance but yours can be wherever.
 
-- [Here's a default.nix for a Jekyll site](https://git.chobble.com/chobble/chobble/src/branch/master/default.nix)
-- [And here's a default.nix for an Eleventy site](https://git.chobble.com/chobble/vegan-prestwich/src/branch/master/default.nix)
+- [Here's a default.nix for a Jekyll site](https://git.chobble.com/chobble/chobble/src/branch/main/default.nix)
+- [And here's a default.nix for an Eleventy site](https://git.chobble.com/chobble/vegan-prestwich/src/branch/main/default.nix)

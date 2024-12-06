@@ -7,6 +7,19 @@ let
   serviceUser = mkServiceName domain;
   serviceId = shortHash domain;
 
+
+  buildCommand = if site.builder or "nix" == "jekyll"
+    then ''
+      nix build --no-link git+https://git.chobble.com/chobble/nix-jekyll-builder#jekyllSite --override-input src . --print-out-paths
+    ''
+    else ''
+      if [ -f "default.nix" ]; then
+        nix-build --no-out-link --print-out-paths
+      else
+        pwd
+      fi
+    '';
+
   deployCommand = if site.host == "neocities" then
     if site ? dryRun && site.dryRun then ''
       echo "[DRY RUN] Would push to Neocities now"
@@ -87,15 +100,7 @@ pkgs.writeShellApplication {
         fail "www_dir is not set!"
       fi
 
-      source_dir=""
-      # Build the site using nix-build if a default.nix exists
-      if [ -f "default.nix" ]; then
-        echo "Building with nix-build..."
-        source_dir=$(nix-build --no-out-link --option substituters "https://nix-community.cachix.org https://cache.nixos.org") || fail "nix-build failed"
-      else
-        echo "No default.nix found, copying files directly..."
-        source_dir="."
-      fi
+      source_dir=$(${buildCommand}) || fail "Build failed"
 
       chmod -R u+w "$www_dir" || fail "Failed to set write permissions"
       find "$www_dir" -mindepth 1 -delete || fail "Failed to clean www directory"

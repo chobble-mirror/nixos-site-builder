@@ -23,6 +23,7 @@
     cd $out
     cp -r $src/* .
     git init
+    git checkout -b main # Create and switch to main branch explicitly
     git add .
     git -c user.name="Test User" -c user.email="test@example.com" commit -m "Initial commit"
     git config --bool core.bare true

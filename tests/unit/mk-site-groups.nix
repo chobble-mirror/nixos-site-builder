@@ -13,11 +13,8 @@ let
   inherit (utils) mkServiceName;
 
   result = mkSiteGroups testSites;
-  expected = {
-    "${mkServiceName "example.com"}" = {};
-  };
-in
-pkgs.runCommand "test-mk-site-groups" {} ''
+  expected = { "${mkServiceName "example.com"}" = { }; };
+in pkgs.runCommand "test-mk-site-groups" { } ''
   if [[ "${builtins.toJSON result}" != "${builtins.toJSON expected}" ]]; then
     echo "Test failed!"
     echo "Expected: ${builtins.toJSON expected}"

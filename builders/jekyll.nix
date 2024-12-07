@@ -10,10 +10,10 @@ let
 in pkgs.stdenv.mkDerivation {
   name = "jekyll-site";
   src = ./.;
-  nativeBuildInputs = [ env pkgs.ruby ];
+  nativeBuildInputs = [ env pkgs.ruby pkgs.jekyll ];
   buildPhase = ''
     echo 'Building Jekyll site'
-    JEKYLL_ENV=production jekyll build --offline --source . --destination _site --trace
+    JEKYLL_ENV=production jekyll build --source . --destination _site --trace
   '';
   installPhase = ''
     mkdir -p $out

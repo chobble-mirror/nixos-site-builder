@@ -22,16 +22,19 @@ let
   normalizeService = service:
     let
       # Remove the script field and normalize paths
-      cleanService = removeAttrs service ["script"];
+      cleanService = removeAttrs service [ "script" ];
 
       # Convert derivation paths to strings
       normalizePaths = x:
-        if builtins.isList x then map normalizePaths x
-        else if builtins.isAttrs x then lib.mapAttrs (name: normalizePaths) x
-        else if builtins.typeOf x == "path" then toString x
-        else x;
-    in
-    normalizePaths cleanService;
+        if builtins.isList x then
+          map normalizePaths x
+        else if builtins.isAttrs x then
+          lib.mapAttrs (name: normalizePaths) x
+        else if builtins.typeOf x == "path" then
+          toString x
+        else
+          x;
+    in normalizePaths cleanService;
 
   normalizedResult = lib.mapAttrs (name: normalizeService) result;
   expectedService = {
@@ -39,7 +42,8 @@ let
       description = "Build example.com website";
       path = with pkgs; [ bash curl git nix ];
       environment = {
-        NIX_PATH = "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:/nix/var/nix/profiles/per-user/root/channels";
+        NIX_PATH =
+          "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:/nix/var/nix/profiles/per-user/root/channels";
         SITE_DOMAIN = "example.com";
         GIT_REPO = "https://github.com/example/site.git";
         SERVICE_USER = serviceUser;
@@ -56,10 +60,7 @@ let
         ProtectKernelModules = true;
         ProtectKernelTunables = true;
         ProtectSystem = "strict";
-        ReadWritePaths = [
-          "/var/lib/${serviceUser}"
-          "/var/www/example.com"
-        ];
+        ReadWritePaths = [ "/var/lib/${serviceUser}" "/var/www/example.com" ];
         BindReadOnlyPaths = [
           "/etc/resolv.conf"
           "/etc/ssl"
@@ -71,6 +72,12 @@ let
         Type = "oneshot";
         User = serviceUser;
         Group = serviceUser;
+        Environment = [
+          "XDG_CACHE_HOME=/var/lib/${serviceUser}/.cache"
+          "XDG_CONFIG_HOME=/var/lib/${serviceUser}/.config"
+          "XDG_DATA_HOME=/var/lib/${serviceUser}/.local/share"
+          "HOME=/var/lib/${serviceUser}"
+        ];
       };
     };
   };
@@ -86,8 +93,7 @@ let
   expectedFile = pkgs.writeText "expected.json" expectedJson;
   resultFile = pkgs.writeText "result.json" resultJson;
 
-in
-pkgs.runCommand "test-mk-site-services" {
+in pkgs.runCommand "test-mk-site-services" {
   buildInputs = [ pkgs.jq pkgs.diffutils ];
   inherit resultJson expectedJson;
   inherit (result.${serviceUser}) script;

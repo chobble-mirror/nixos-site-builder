@@ -1,4 +1,5 @@
-{ pkgs, utils, mkSiteBuilder ? import ./mkSiteBuilder.nix { inherit pkgs utils; } }:
+{ pkgs, utils
+, mkSiteBuilder ? import ./mkSiteBuilder.nix { inherit pkgs utils; } }:
 
 sites:
 let
@@ -11,14 +12,10 @@ let
     in {
       "${serviceUser}" = {
         description = "Build ${domain} website";
-        path = with pkgs; [
-          bash
-          curl
-          git
-          nix
-        ];
+        path = with pkgs; [ bash curl git nix ];
         environment = {
-          NIX_PATH = "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:/nix/var/nix/profiles/per-user/root/channels";
+          NIX_PATH =
+            "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:/nix/var/nix/profiles/per-user/root/channels";
           SITE_DOMAIN = domain;
           GIT_REPO = cfg.gitRepo;
           SERVICE_USER = serviceUser;
@@ -42,9 +39,12 @@ let
           RestrictNamespaces = true;
           RestrictRealtime = true;
 
-          ReadWritePaths = [
-            "/var/lib/${serviceUser}"
-            "/var/www/${domain}"
+          ReadWritePaths = [ "/var/lib/${serviceUser}" "/var/www/${domain}" ];
+          Environment = [
+            "XDG_CACHE_HOME=/var/lib/${serviceUser}/.cache"
+            "XDG_CONFIG_HOME=/var/lib/${serviceUser}/.config"
+            "XDG_DATA_HOME=/var/lib/${serviceUser}/.local/share"
+            "HOME=/var/lib/${serviceUser}"
           ];
 
           BindReadOnlyPaths = [
@@ -59,7 +59,5 @@ let
         };
       };
     };
-in
-builtins.foldl' (acc: domain:
-  acc // (mkService domain sites.${domain})
-) {} (builtins.attrNames sites)
+in builtins.foldl' (acc: domain: acc // (mkService domain sites.${domain})) { }
+(builtins.attrNames sites)

@@ -5,7 +5,6 @@ with lib;
 let
   cfg = config.services.site-builder;
 
-  # Define custom types for better type safety
   siteConfig = types.submodule {
     options = {
       gitRepo = mkOption {
@@ -21,7 +20,7 @@ let
       builder = mkOption {
         type = types.enum [ "nix" "jekyll" ];
         default = "nix";
-        description = mdDoc "Site builder to use. Either 'nix' for nix-build or 'jekyll' for nix-jekyll-builder";
+        description = mdDoc "Site builder to use. Either 'nix' or 'jekyll'";
       };
       wwwRedirect = mkOption {
         type = types.bool;
@@ -51,7 +50,6 @@ let
     };
   };
 
-  # Import the library functions
   siteLib = import ../lib { inherit pkgs; };
 
   hasCaddySites = sites:
@@ -63,7 +61,7 @@ in {
 
     sites = mkOption {
       type = types.attrsOf siteConfig;
-      default = {};
+      default = { };
       description = mdDoc ''
         Attribute set of sites to build and serve.
         Each site is configured with a git repository and optional settings.
@@ -86,21 +84,18 @@ in {
         description = mdDoc "Whether to enable and configure Caddy web server";
       };
     };
-
-    environment.systemPackages = [
-      (siteLib.mkSiteCommands cfg.sites)
-    ];
   };
 
   config = mkIf cfg.enable {
     assertions = [
       {
-        assertion = cfg.sites != {};
-        message = "At least one site must be configured when site-builder is enabled";
+        assertion = cfg.sites != { };
+        message =
+          "At least one site must be configured when site-builder is enabled";
       }
       {
         assertion = !hasCaddySites cfg.sites || cfg.caddy.enable;
-        message = "Caddy must be enabled when a site has host=\"caddy\"";
+        message = ''Caddy must be enabled when a site has host="caddy"'';
       }
     ];
 
@@ -119,8 +114,6 @@ in {
       # };
     };
 
-    environment.systemPackages = [
-      (siteLib.mkSiteCommands cfg.sites)
-    ];
+    environment.systemPackages = [ (siteLib.mkSiteCommands cfg.sites) ];
   };
 }

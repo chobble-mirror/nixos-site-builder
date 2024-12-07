@@ -1,6 +1,6 @@
 { pkgs, lib, utils }:
 let
-  testLib = import ./lib.nix { inherit pkgs lib; };
+  testLib = import ./lib.nix { inherit pkgs lib utils; };
   testSite = testLib.mkTestSite {
     name = "command-test";
     content = "<h1>Command Test Site</h1>";
@@ -47,23 +47,17 @@ in {
       createHome = true;
     };
 
-    users.groups.${serviceUser} = {};
+    users.groups.${serviceUser} = { };
 
     # Enable the service for testing
-    systemd.services.${serviceUser} = {
-      wantedBy = [ "multi-user.target" ];
-    };
+    systemd.services.${serviceUser} = { wantedBy = [ "multi-user.target" ]; };
 
     virtualisation = {
       memorySize = 1024;
       diskSize = 2048;
     };
 
-    environment.systemPackages = with pkgs; [
-      git
-      curl
-      siteCommand
-    ];
+    environment.systemPackages = with pkgs; [ git curl siteCommand ];
 
     systemd.tmpfiles.rules = [
       "d /var/www 0755 root root -"
@@ -72,7 +66,6 @@ in {
       "d /var/lib/${serviceUser}/site-builder-example.test 0755 ${serviceUser} ${serviceUser} -"
     ];
   };
-
 
   testScript = ''
     start_all()
@@ -107,7 +100,9 @@ in {
         info = machine.succeed("cat /var/www/example.test/.site-info")
         assert "domain: example.test" in info, "Domain not found in site info"
         assert "service: ${serviceUser}" in info, "Service not found in site info"
-        assert "id: ${shortHash "example.test"}" in info, "ID not found in site info"
+        assert "id: ${
+          shortHash "example.test"
+        }" in info, "ID not found in site info"
 
     with subtest("Test site command restart"):
         machine.succeed("site restart example.test")

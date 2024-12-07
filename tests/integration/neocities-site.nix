@@ -1,9 +1,9 @@
 { pkgs, lib, utils }:
 
-with import ./lib.nix { inherit pkgs lib; };
+with import ./lib.nix { inherit pkgs lib utils; };
 
 let
-  testLib = import ./lib.nix { inherit pkgs lib; };
+  testLib = import ./lib.nix { inherit pkgs lib utils; };
   testSite = testLib.mkTestSite {
     name = "neocities";
     content = "<h1>Neocities Test Site</h1>";
@@ -42,7 +42,7 @@ in {
 
     systemd.tmpfiles.rules = [
       "d /var/www 0755 root root -"
-      "d /var/www/neocities.test 0755 root root -"
+      "d /var/www/neocities.test 0755 caddy caddy -"
     ];
   };
 

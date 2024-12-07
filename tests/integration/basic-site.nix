@@ -1,9 +1,9 @@
 { pkgs, lib, utils }:
 
-with import ./lib.nix { inherit pkgs lib; };
+with import ./lib.nix { inherit pkgs lib utils; };
 
 let
-  testLib = import ./lib.nix { inherit pkgs lib; };
+  testLib = import ./lib.nix { inherit pkgs lib utils; };
   testSite = testLib.mkTestSite {
     name = "basic";
     content = "<h1>Basic Test Site</h1>";

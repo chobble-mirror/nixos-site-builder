@@ -15,8 +15,7 @@ let
   };
   inherit (utils) mkServiceName;
   result = mkSiteCommands testSites;
-in
-pkgs.runCommand "test-mk-site-commands" {
+in pkgs.runCommand "test-mk-site-commands" {
   buildInputs = [ pkgs.bash ];
   script = "${result}/bin/site";
 } ''

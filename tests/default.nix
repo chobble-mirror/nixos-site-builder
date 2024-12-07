@@ -1,7 +1,5 @@
-{ pkgs, utils }:
+{ pkgs, lib, utils }:
 let
   lib = pkgs.lib;
-  importTests = path: import path { inherit pkgs lib utils; };
-in
-importTests ./unit //
-importTests ./integration
+  importTests = path: args: import path ({ inherit pkgs lib utils; } // args);
+in importTests ./unit { } // importTests ./integration { }

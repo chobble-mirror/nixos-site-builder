@@ -1,9 +1,9 @@
 { pkgs, lib, utils }:
 
-with import ./lib.nix { inherit pkgs lib; };
+with import ./lib.nix { inherit pkgs lib utils; };
 
 let
-  testLib = import ./lib.nix { inherit pkgs lib; };
+  testLib = import ./lib.nix { inherit pkgs lib utils; };
   site1 = testLib.mkTestSite {
     name = "site1";
     content = "<h1>First Test Site</h1>";
@@ -20,11 +20,8 @@ in {
   nodes.machine = { config, pkgs, ... }: {
     imports = [ ../../modules/site-builder.nix ];
 
-    networking.hosts."127.0.0.1" = [
-      "first.test"
-      "www.first.test"
-      "second.test"
-    ];
+    networking.hosts."127.0.0.1" =
+      [ "first.test" "www.first.test" "second.test" ];
 
     environment.etc."gitconfig".text = ''
       [safe]

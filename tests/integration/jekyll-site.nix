@@ -4,19 +4,22 @@ with import ./lib.nix { inherit pkgs lib; };
 
 let
   testLib = import ./lib.nix { inherit pkgs lib; };
-  testRepoPath = testLib.mkTestRepo {
-    testFiles = pkgs.runCommand "jekyll-test-files" { } ''
-      # shellcheck disable=SC2154,SC2086,SC2027
-      mkdir -p $out
-      cp -r ${./jekyll}/* $out/
-    '';
-  };
+  testRepoPath = testLib.mkTestRepo (pkgs.runCommand "jekyll-test-files" { } ''
+    mkdir -p $out
+    cp ${./jekyll}/Gemfile $out/
+    cp ${./jekyll}/Gemfile.lock $out/
+    cp ${./jekyll}/gemset.nix $out/
+    cp ${./jekyll}/index.md $out/
+    cp ${./jekyll}/_config.yml $out/
+  '');
 in {
   name = "site-builder-jekyll";
 
   nodes.machine = { config, pkgs, ... }: {
     imports = [ ../../modules/site-builder.nix ];
 
+    nixpkgs.hostPlatform = "x86_64-linux";
+    nix.settings.sandbox = "relaxed";
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
     networking.hosts."127.0.0.1" = [ "jekyll.test" ];

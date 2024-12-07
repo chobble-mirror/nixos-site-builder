@@ -1,19 +1,22 @@
-{ pkgs ? import <nixpkgs> { }, name }:
-
+{ pkgs }:
 let
   env = pkgs.bundlerEnv {
+    name = "jekyll-site-env"; # Add name to bundlerEnv
     ruby = pkgs.ruby;
     gemfile = ./Gemfile;
     lockfile = ./Gemfile.lock;
     gemset = ./gemset.nix;
   };
 in pkgs.stdenv.mkDerivation {
-  inherit name;
+  name = "jekyll-site";
   src = ./.;
-
   nativeBuildInputs = [ env pkgs.ruby ];
-
   buildPhase = ''
-    JEKYLL_ENV=production jekyll build --source . --destination _site --trace
+    echo 'Building Jekyll site'
+    JEKYLL_ENV=production jekyll build --offline --source . --destination _site --trace
+  '';
+  installPhase = ''
+    mkdir -p $out
+    cp -r _site/* $out/
   '';
 }

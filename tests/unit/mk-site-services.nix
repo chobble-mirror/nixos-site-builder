@@ -42,8 +42,7 @@ let
       description = "Build example.com website";
       path = with pkgs; [ bash curl git nix ];
       environment = {
-        NIX_PATH =
-          "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:/nix/var/nix/profiles/per-user/root/channels";
+        NIX_PATH = "nixpkgs=${pkgs.path}";
         SITE_DOMAIN = "example.com";
         GIT_REPO = "https://github.com/example/site.git";
         SERVICE_USER = serviceUser;

@@ -16,11 +16,11 @@ let
 
   buildDefaultNixCommand = if builderDefault != null then ''
     echo "Creating default.nix from builder template"
-    echo "${toString builderDefault}" > default.nix
+    cat > default.nix <<'EOF'
+    ${toString builderDefault}
+    EOF
   '' else
     "";
-
-  buildName = "${domain}-site";
 
   deployCommand = if site.host == "neocities" then
     if site ? dryRun && site.dryRun then ''
@@ -102,10 +102,12 @@ in pkgs.writeShellApplication {
 
       ${buildDefaultNixCommand}
 
-      if [ -f "default.nix" ]; then
-        cat "default.nix"
+      if [ -f "$repo_dir/default.nix" ]; then
+        cat "$repo_dir/default.nix"
         echo "Building from default.nix (${builder})"
-        source_dir=$(nix-build --no-out-link --arg name "${buildName}")
+        source_dir=$(NIX_PATH=nixpkgs=${pkgs.path} nix-build --no-out-link \
+          -E "with import ${pkgs.path} {}; callPackage ./default.nix {}")
+        echo "$source_dir"
       else
         echo "Copying from pwd"
         source_dir=$(pwd)

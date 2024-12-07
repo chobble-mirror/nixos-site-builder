@@ -12,22 +12,21 @@ let
         </html>
       '';
 
-    mkTestRepo = site:
+    mkTestRepo = input:
       toString (pkgs.runCommand "test-repo" {
         buildInputs = [ pkgs.git ];
-        inherit site;
+        inherit input;
         GIT_COMMITTER_NAME = "Test User";
         GIT_COMMITTER_EMAIL = "test@example.com";
         GIT_AUTHOR_NAME = "Test User";
         GIT_AUTHOR_EMAIL = "test@example.com";
-        # Add these to handle the git config
         HOME = "/build";
         NIX_BUILD_TOP = "/build";
       } ''
         mkdir -p $HOME
-        mkdir -p $out
+        mkdir $out
         cd $out
-        cp -r $site/* .
+        cp -r $input/* .
         git config --global init.defaultBranch main
         git init
         git add .
@@ -39,6 +38,7 @@ let
       # Check site files
       machine.succeed("test -f /var/www/${domain}/index.html")
       machine.succeed("test -s /var/www/${domain}/index.html")
+
       # Test HTTP response
       machine.succeed("curl -f http://${domain}/index.html > /tmp/${domain}-content")
     '';

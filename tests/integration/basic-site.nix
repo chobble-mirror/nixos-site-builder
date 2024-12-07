@@ -21,7 +21,7 @@ in {
 
     environment.etc."gitconfig".text = ''
       [safe]
-          directory = *
+        directory = *
     '';
 
     services.site-builder = {

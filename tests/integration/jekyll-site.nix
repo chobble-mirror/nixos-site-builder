@@ -4,18 +4,13 @@ with import ./lib.nix { inherit pkgs lib; };
 
 let
   testLib = import ./lib.nix { inherit pkgs lib; };
-  testSite = testLib.mkTestSite {
-    name = "jekyll";
-    filename = "index.md";
-    content = ''
-      ---
-      layout: default
-      title: Jekyll Test
-      ---
-      # Jekyll Test Site
+  testRepoPath = testLib.mkTestRepo {
+    testFiles = pkgs.runCommand "jekyll-test-files" { } ''
+      # shellcheck disable=SC2154,SC2086,SC2027
+      mkdir -p $out
+      cp -r ${./jekyll}/* $out/
     '';
   };
-  testRepoPath = testLib.mkTestRepo testSite;
 in {
   name = "site-builder-jekyll";
 

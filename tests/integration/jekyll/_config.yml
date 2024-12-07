@@ -1,0 +1,13 @@
+url: "http://localhost"
+markdown: kramdown
+exclude:
+  - build
+  - shell.nix
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - bin/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor

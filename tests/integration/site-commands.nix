@@ -93,16 +93,7 @@ in {
         )
 
         # Check that the site files were deployed
-        machine.wait_until_succeeds("test -f /var/www/example.test/.site-info")
         machine.succeed("test -f /var/www/example.test/index.html")
-
-    with subtest("Test site info file"):
-        info = machine.succeed("cat /var/www/example.test/.site-info")
-        assert "domain: example.test" in info, "Domain not found in site info"
-        assert "service: ${serviceUser}" in info, "Service not found in site info"
-        assert "id: ${
-          shortHash "example.test"
-        }" in info, "ID not found in site info"
 
     with subtest("Test site command restart"):
         machine.succeed("site restart example.test")

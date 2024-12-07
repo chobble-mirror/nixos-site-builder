@@ -24,11 +24,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1733498501,
-        "narHash": "sha256-cBgMyxWXUPGSaE4XhtSXSbh0ZKxbQu8ZX90IxNQQCXM=",
+        "lastModified": 1733540202,
+        "narHash": "sha256-mer+odv2smWgxIAxiixDusr+HUnY7+mP3ebylW9Rjbg=",
         "ref": "refs/heads/main",
-        "rev": "1a6f8ae45c1d67f8cc2e15bc77023fab87ff98a6",
-        "revCount": 3,
+        "rev": "cb8b1cbb0b40c30a792332b95fc6638d8367e379",
+        "revCount": 4,
         "type": "git",
         "url": "https://git.chobble.com/chobble/nix-jekyll-builder"
       },

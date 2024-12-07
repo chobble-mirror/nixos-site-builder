@@ -4,7 +4,8 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    jekyll-builder.url = "git+https://git.chobble.com/chobble/nix-jekyll-builder";
+    jekyll-builder.url =
+      "git+https://git.chobble.com/chobble/nix-jekyll-builder";
   };
 
   outputs = { self, nixpkgs, nixpkgs-unstable, jekyll-builder }:
@@ -18,8 +19,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           utils = import ./lib/utils.nix;
-        in import ./tests { inherit pkgs utils; }
-      );
+        in import ./tests { inherit pkgs utils; });
 
       # Convenience apps for running specific test suites
       apps = forAllSystems (system: {
@@ -40,16 +40,11 @@
       });
 
       devShells = forAllSystems (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
+        let pkgs = nixpkgs.legacyPackages.${system};
         in {
           default = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              nixpkgs-fmt
-              shellcheck
-            ];
+            buildInputs = with pkgs; [ nixpkgs-fmt shellcheck ];
           };
-        }
-      );
+        });
     };
 }

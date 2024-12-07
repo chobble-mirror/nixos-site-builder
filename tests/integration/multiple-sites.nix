@@ -20,11 +20,8 @@ in {
   nodes.machine = { config, pkgs, ... }: {
     imports = [ ../../modules/site-builder.nix ];
 
-    networking.hosts."127.0.0.1" = [
-      "first.test"
-      "www.first.test"
-      "second.test"
-    ];
+    networking.hosts."127.0.0.1" =
+      [ "first.test" "www.first.test" "second.test" ];
 
     environment.etc."gitconfig".text = ''
       [safe]

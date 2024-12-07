@@ -4,8 +4,7 @@ sites:
 let
   inherit (utils) mkServiceName;
   mkTimer = domain: cfg:
-    let
-      serviceUser = mkServiceName domain;
+    let serviceUser = mkServiceName domain;
     in {
       "${serviceUser}" = {
         wantedBy = [ "timers.target" ];
@@ -16,8 +15,5 @@ let
         };
       };
     };
-in
-builtins.foldl'
-  (acc: domain: acc // (mkTimer domain sites.${domain}))
-  {}
-  (builtins.attrNames sites)
+in builtins.foldl' (acc: domain: acc // (mkTimer domain sites.${domain})) { }
+(builtins.attrNames sites)

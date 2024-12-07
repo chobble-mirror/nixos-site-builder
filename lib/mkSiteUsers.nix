@@ -5,8 +5,7 @@ let
   inherit (utils) mkServiceName;
 
   mkUser = domain: cfg:
-    let
-      serviceUser = mkServiceName domain;
+    let serviceUser = mkServiceName domain;
     in {
       ${serviceUser} = {
         isSystemUser = true;
@@ -14,7 +13,5 @@ let
         description = "${domain} website builder service user";
       };
     };
-in
-builtins.foldl' (acc: domain:
-  acc // (mkUser domain sites.${domain})
-) {} (builtins.attrNames sites)
+in builtins.foldl' (acc: domain: acc // (mkUser domain sites.${domain})) { }
+(builtins.attrNames sites)

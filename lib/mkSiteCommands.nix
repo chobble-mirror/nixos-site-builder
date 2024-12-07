@@ -5,9 +5,9 @@ let
   inherit (utils) mkServiceName;
 
   # Create a mapping of domains to service IDs
-  domainMap = builtins.foldl' (acc: domain:
-    acc // { ${domain} = mkServiceName domain; }
-  ) {} (builtins.attrNames sites);
+  domainMap =
+    builtins.foldl' (acc: domain: acc // { ${domain} = mkServiceName domain; })
+    { } (builtins.attrNames sites);
 
   # Create the command script
   script = pkgs.writeShellScriptBin "site" ''
@@ -33,18 +33,18 @@ let
 
     # Create domain to service mapping
     declare -A services=(
-      ${builtins.concatStringsSep "\n      " (
-        builtins.attrValues (builtins.mapAttrs (domain: service:
-          ''["${domain}"]="${service}"''
-        ) domainMap)
-      )}
+      ${
+        builtins.concatStringsSep "\n      " (builtins.attrValues
+          (builtins.mapAttrs (domain: service: ''["${domain}"]="${service}"'')
+            domainMap))
+      }
     )
 
     case "$command" in
     "list")
       echo "Managed sites:"
-      ${builtins.concatStringsSep "\n        " (
-        builtins.map (domain: ''
+      ${
+        builtins.concatStringsSep "\n        " (builtins.map (domain: ''
           service="''${services[${domain}]}"
           last_run=$(systemctl show "$service" \
             --property=ExecMainStartTimestamp | cut -d= -f2 | \
@@ -55,8 +55,8 @@ let
           next_fmt=''${next_run:+" (next: $next_run)"}
           echo "  ${domain} (service: $service)"
           echo "    Last run: $last_run$next_fmt"
-        '') (builtins.attrNames sites)
-      )}
+        '') (builtins.attrNames sites))
+      }
     ;;
     "status"|"restart")
       if [ -z "$domain" ]; then
@@ -80,5 +80,4 @@ let
       ;;
     esac
   '';
-in
-script
+in script

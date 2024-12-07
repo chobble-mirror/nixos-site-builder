@@ -48,10 +48,11 @@ let
       expected = true;
     }
   ];
-in
-pkgs.runCommand "test-mk-site-vhosts" {} ''
+in pkgs.runCommand "test-mk-site-vhosts" { } ''
   ${lib.concatMapStrings (t: ''
-    if [[ "${builtins.toJSON t.test}" != "${builtins.toJSON t.expected}" ]]; then
+    if [[ "${builtins.toJSON t.test}" != "${
+      builtins.toJSON t.expected
+    }" ]]; then
       echo "Test '${t.name}' failed!"
       echo "Expected: ${builtins.toJSON t.expected}"
       echo "Got: ${builtins.toJSON t.test}"

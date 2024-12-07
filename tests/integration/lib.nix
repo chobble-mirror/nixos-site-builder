@@ -1,7 +1,8 @@
 { pkgs, lib }: {
   # Helper to create a test site with specific content
-  mkTestSite = { name, content ? "<h1>Test Site</h1>" }:
-    pkgs.writeTextDir "index.html" ''
+  mkTestSite =
+    { name, content ? "<h1>Test Site</h1>", filename ? "index.html" }:
+    pkgs.writeTextDir "${filename}" ''
       <!DOCTYPE html>
       <html>
         <body>

@@ -1,6 +1,3 @@
-# TODO: This isn't actually testing properly because mkTestSite makes an
-# index.html
-
 { pkgs, lib, utils, ... }:
 
 with import ./lib.nix { inherit pkgs lib; };
@@ -9,6 +6,7 @@ let
   testLib = import ./lib.nix { inherit pkgs lib; };
   testSite = testLib.mkTestSite {
     name = "jekyll";
+    filename = "index.md";
     content = ''
       ---
       layout: default

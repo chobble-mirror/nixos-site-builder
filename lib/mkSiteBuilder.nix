@@ -7,9 +7,25 @@ let
   serviceUser = mkServiceName domain;
   serviceId = shortHash domain;
 
+  builderDefault = if site.builder == "jekyll" then
+    builtins.readFile ../builders/jekyll.nix
+  else
+    null;
+
+  buildName = "${domain}-site";
+
   buildCommand = ''
+    if [ -n "${toString builderDefault}" ]; then
+      cat > default.nix <<'EOF'
+    { pkgs ? import <nixpkgs> {}
+    , name ? "${buildName}"
+    }:
+    ${toString builderDefault}
+    EOF
+    fi
+
     if [ -f "default.nix" ]; then
-      nix-build --no-out-link --print-out-paths
+      nix-build --no-out-link --print-out-paths --arg name "${buildName}"
     else
       pwd
     fi

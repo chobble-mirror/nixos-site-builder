@@ -21,8 +21,7 @@ let
       builder = mkOption {
         type = types.enum [ "nix" "jekyll" ];
         default = "nix";
-        description = mdDoc
-          "Site builder to use. Either 'nix' for nix-build or 'jekyll' for nix-jekyll-builder";
+        description = "Site builder to use. Either 'nix' (default) or 'jekyll'";
       };
       wwwRedirect = mkOption {
         type = types.bool;
@@ -60,12 +59,12 @@ let
 
 in {
   options.services.site-builder = {
-    enable = mkEnableOption (mdDoc "static site builder service");
+    enable = mkEnableOption ("static site builder service");
 
     sites = mkOption {
       type = types.attrsOf siteConfig;
       default = { };
-      description = mdDoc ''
+      description = ''
         Attribute set of sites to build and serve.
         Each site is configured with a git repository and optional settings.
       '';
@@ -84,7 +83,7 @@ in {
       enable = mkOption {
         type = types.bool;
         default = true;
-        description = mdDoc "Whether to enable and configure Caddy web server";
+        description = "Whether to enable and configure Caddy web server";
       };
     };
 

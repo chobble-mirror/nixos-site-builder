@@ -12,11 +12,8 @@ let
             roll_keep 1
             roll_keep_for 24h
           }
-          format filter {
-            request>headers>User-Agent delete
-            request>headers>Cookie delete
-            request>remote_ip ip_mask 16 32
-            request>client_ip ip_mask 16 32
+          format transform `{request>remote_ip} - {request>user_id} [{ts}] "{request>method} {request>uri} {request>proto}" {status} {size} "{request>headers>Referer>[0]}" "{request>headers>User-Agent>[0]}"` {
+            time_format "02/Jan/2006:15:04:05 -0700"
           }
         }
       '';

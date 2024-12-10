@@ -17,7 +17,8 @@ let
             time_format "02/Jan/2006:15:04:05 -0700"
           }
         }
-        log_skip header_regexp User-Agent Uptime-Kuma
+        @uptime_kuma header_regexp User-Agent ^Uptime-Kuma$
+        log_skip @uptime_kuma
       '';
     in
     if host != "caddy" then

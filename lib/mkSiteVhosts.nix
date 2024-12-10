@@ -2,7 +2,8 @@
 
 sites:
 let
-  mkVhost = domain: cfg:
+  mkVhost =
+    domain: cfg:
     let
       host = cfg.host or "caddy";
       loggingConfig = domain: ''
@@ -16,12 +17,16 @@ let
             time_format "02/Jan/2006:15:04:05 -0700"
           }
         }
+        log_skip header_regexp User-Agent Uptime-Kuma
       '';
-    in if host != "caddy" then
+    in
+    if host != "caddy" then
       { }
     else
-      let protocol = if cfg.useHTTPS then "https" else "http";
-      in {
+      let
+        protocol = if cfg.useHTTPS then "https" else "http";
+      in
+      {
         "${protocol}://${domain}" = {
           listenAddresses = [ "0.0.0.0" ];
           extraConfig = ''
@@ -41,15 +46,22 @@ let
             header @static Cache-Control max-age=5184000
           '';
         };
-      } // (if cfg.wwwRedirect then {
-        "${protocol}://www.${domain}" = {
-          listenAddresses = [ "0.0.0.0" ];
-          extraConfig = ''
-            ${loggingConfig domain}
-            redir ${protocol}://${domain}{uri} permanent
-          '';
-        };
-      } else
-        { });
-in builtins.foldl' (acc: domain: acc // (mkVhost domain sites.${domain})) { }
-(builtins.attrNames sites)
+      }
+      // (
+        if cfg.wwwRedirect then
+          {
+            "${protocol}://www.${domain}" = {
+              listenAddresses = [ "0.0.0.0" ];
+              extraConfig = ''
+                ${loggingConfig domain}
+                redir ${protocol}://${domain}{uri} permanent
+              '';
+            };
+          }
+        else
+          { }
+      );
+in
+builtins.foldl' (acc: domain: acc // (mkVhost domain sites.${domain})) { } (
+  builtins.attrNames sites
+)

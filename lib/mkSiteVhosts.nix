@@ -9,7 +9,7 @@ let
       loggingConfig = domain: ''
         log {
           output file /var/log/caddy/access-${domain}.log {
-            roll_size 100mb
+            roll_size 1mb
             roll_keep 1
             roll_keep_for 24h
           }

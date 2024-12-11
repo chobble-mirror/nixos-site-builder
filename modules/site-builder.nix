@@ -130,10 +130,6 @@ in
       enable = true;
       package = customCaddy;
       virtualHosts = siteLib.mkSiteVhosts cfg.sites;
-      # package = pkgs.caddy.withPlugins {
-      #   plugins = [ "github.com/caddyserver/transform-encoder" ];
-      #   hash = "sha256-wrooonngg=";
-      # };
     };
 
     environment.systemPackages = [ (siteLib.mkSiteCommands cfg.sites) ];

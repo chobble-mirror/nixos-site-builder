@@ -6,19 +6,15 @@ let
     domain: cfg:
     let
       host = cfg.host or "caddy";
-      loggingConfig = domain: ''
-        log {
-          output file /var/log/caddy/${domain}.log {
-            roll_size 1mb
-            roll_keep 1
-            roll_keep_for 24h
-          }
-          format transform `{request>remote_ip} - {request>user_id} [{ts}] "{request>method} {request>uri} {request>proto}" {status} {size} "{request>headers>Referer>[0]}" "{request>headers>User-Agent>[0]}"` {
-            time_format "02/Jan/2006:15:04:05 -0700"
-          }
+      mkLogFormat = domain: ''
+        output file /var/log/caddy/${domain}.log {
+          roll_size 1mb
+          roll_keep 1
+          roll_keep_for 24h
         }
-        @uptime_kuma header_regexp User-Agent ^Uptime-Kuma
-        log_skip @uptime_kuma
+        format transform `{request>remote_ip} - {request>user_id} [{ts}] "{request>method} {request>uri} {request>proto}" {status} {size} "{request>headers>Referer>[0]}" "{request>headers>User-Agent>[0]}"` {
+          time_format "02/Jan/2006:15:04:05 -0700"
+        }
       '';
     in
     if host != "caddy" then
@@ -32,7 +28,6 @@ let
           listenAddresses = [ "0.0.0.0" ];
           extraConfig = ''
             root * /var/www/${domain}
-            ${loggingConfig domain}
             file_server
             encode gzip zstd
 
@@ -45,7 +40,11 @@ let
               path_regexp \.(ico|css|js|gif|jpg|jpeg|png|svg|webp|woff)$
             }
             header @static Cache-Control max-age=5184000
+
+            @uptime_kuma header_regexp User-Agent ^Uptime-Kuma
+            log_skip @uptime_kuma
           '';
+          logFormat = mkLogFormat domain;
         };
       }
       // (
@@ -54,9 +53,9 @@ let
             "${protocol}://www.${domain}" = {
               listenAddresses = [ "0.0.0.0" ];
               extraConfig = ''
-                ${loggingConfig domain}
                 redir ${protocol}://${domain}{uri} permanent
               '';
+              logFormat = mkLogFormat domain;
             };
           }
         else

@@ -1,4 +1,9 @@
-{ pkgs, lib, utils }:
+{
+  pkgs,
+  lib,
+  utils,
+  customCaddy,
+}:
 let
   testLib = import ./lib.nix { inherit pkgs lib; };
   testSite = testLib.mkTestSite {
@@ -17,55 +22,68 @@ let
       useHTTPS = false;
     };
   };
-in {
+in
+{
   name = "site-builder-commands";
 
-  nodes.machine = { config, pkgs, ... }: {
-    imports = [ ../../modules/site-builder.nix ];
+  nodes.machine =
+    { config, pkgs, ... }:
+    {
+      imports = [
+        {
+          imports = [ ../../modules/site-builder.nix ];
+          _module.args.customCaddy = customCaddy;
+        }
+      ];
+      networking.hosts."127.0.0.1" = [ "example.test" ];
 
-    networking.hosts."127.0.0.1" = [ "example.test" ];
+      environment.etc."gitconfig".text = ''
+        [safe]
+            directory = *
+      '';
 
-    environment.etc."gitconfig".text = ''
-      [safe]
-          directory = *
-    '';
-
-    services.site-builder = {
-      enable = true;
-      sites."example.test" = {
-        gitRepo = "file://${testRepoPath}";
-        wwwRedirect = false;
-        useHTTPS = false;
+      services.site-builder = {
+        enable = true;
+        sites."example.test" = {
+          gitRepo = "file://${testRepoPath}";
+          wwwRedirect = false;
+          useHTTPS = false;
+        };
       };
+
+      # Create required users and groups
+      users.users.${serviceUser} = {
+        isSystemUser = true;
+        group = serviceUser;
+        home = "/var/lib/${serviceUser}";
+        createHome = true;
+      };
+
+      users.groups.${serviceUser} = { };
+
+      # Enable the service for testing
+      systemd.services.${serviceUser} = {
+        wantedBy = [ "multi-user.target" ];
+      };
+
+      virtualisation = {
+        memorySize = 1024;
+        diskSize = 2048;
+      };
+
+      environment.systemPackages = with pkgs; [
+        git
+        curl
+        siteCommand
+      ];
+
+      systemd.tmpfiles.rules = [
+        "d /var/www 0755 root root -"
+        "d /var/www/example.test 0755 ${serviceUser} ${serviceUser} -"
+        "d /var/lib/${serviceUser} 0755 ${serviceUser} ${serviceUser} -"
+        "d /var/lib/${serviceUser}/site-builder-example.test 0755 ${serviceUser} ${serviceUser} -"
+      ];
     };
-
-    # Create required users and groups
-    users.users.${serviceUser} = {
-      isSystemUser = true;
-      group = serviceUser;
-      home = "/var/lib/${serviceUser}";
-      createHome = true;
-    };
-
-    users.groups.${serviceUser} = { };
-
-    # Enable the service for testing
-    systemd.services.${serviceUser} = { wantedBy = [ "multi-user.target" ]; };
-
-    virtualisation = {
-      memorySize = 1024;
-      diskSize = 2048;
-    };
-
-    environment.systemPackages = with pkgs; [ git curl siteCommand ];
-
-    systemd.tmpfiles.rules = [
-      "d /var/www 0755 root root -"
-      "d /var/www/example.test 0755 ${serviceUser} ${serviceUser} -"
-      "d /var/lib/${serviceUser} 0755 ${serviceUser} ${serviceUser} -"
-      "d /var/lib/${serviceUser}/site-builder-example.test 0755 ${serviceUser} ${serviceUser} -"
-    ];
-  };
 
   testScript = ''
     start_all()

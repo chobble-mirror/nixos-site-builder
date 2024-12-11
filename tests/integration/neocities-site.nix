@@ -1,4 +1,9 @@
-{ pkgs, lib, utils }:
+{
+  pkgs,
+  lib,
+  utils,
+  customCaddy,
+}:
 
 with import ./lib.nix { inherit pkgs lib; };
 
@@ -9,42 +14,45 @@ let
     content = "<h1>Neocities Test Site</h1>";
   };
   testRepoPath = testLib.mkTestRepo testSite;
-in {
+in
+{
   name = "site-builder-neocities";
 
-  nodes.machine = { config, pkgs, ... }: {
-    imports = [ ../../modules/site-builder.nix ];
+  nodes.machine =
+    { config, pkgs, ... }:
+    {
+      imports = [ ../../modules/site-builder.nix ];
 
-    environment.etc."gitconfig".text = ''
-      [safe]
-          directory = *
-    '';
+      environment.etc."gitconfig".text = ''
+        [safe]
+            directory = *
+      '';
 
-    services.site-builder = {
-      enable = true;
-      caddy.enable = false;
-      sites."neocities.test" = {
-        gitRepo = "file://${testRepoPath}";
-        wwwRedirect = false;
-        useHTTPS = false;
-        host = "neocities";
-        apiKey = "dummy-key";
-        dryRun = true;
+      services.site-builder = {
+        enable = true;
+        caddy.enable = false;
+        sites."neocities.test" = {
+          gitRepo = "file://${testRepoPath}";
+          wwwRedirect = false;
+          useHTTPS = false;
+          host = "neocities";
+          apiKey = "dummy-key";
+          dryRun = true;
+        };
       };
+
+      virtualisation = {
+        memorySize = 1024;
+        diskSize = 2048;
+      };
+
+      environment.systemPackages = [ pkgs.git ];
+
+      systemd.tmpfiles.rules = [
+        "d /var/www 0755 root root -"
+        "d /var/www/neocities.test 0755 root root -"
+      ];
     };
-
-    virtualisation = {
-      memorySize = 1024;
-      diskSize = 2048;
-    };
-
-    environment.systemPackages = [ pkgs.git ];
-
-    systemd.tmpfiles.rules = [
-      "d /var/www 0755 root root -"
-      "d /var/www/neocities.test 0755 root root -"
-    ];
-  };
 
   testScript = ''
     start_all()

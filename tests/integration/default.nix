@@ -1,4 +1,9 @@
-{ pkgs, lib, utils }:
+{
+  pkgs,
+  lib,
+  utils,
+  customCaddy,
+}:
 
 let
   tests = {
@@ -8,5 +13,17 @@ let
     multiple = ./multiple-sites.nix;
     commands = ./site-commands.nix;
   };
-in builtins.mapAttrs
-(name: path: pkgs.nixosTest (import path { inherit pkgs lib utils; })) tests
+in
+builtins.mapAttrs (
+  name: path:
+  pkgs.nixosTest (
+    import path {
+      inherit
+        pkgs
+        lib
+        utils
+        customCaddy
+        ;
+    }
+  )
+) tests

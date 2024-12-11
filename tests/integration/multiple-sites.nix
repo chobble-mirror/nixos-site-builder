@@ -1,4 +1,9 @@
-{ pkgs, lib, utils }:
+{
+  pkgs,
+  lib,
+  utils,
+  customCaddy,
+}:
 
 with import ./lib.nix { inherit pkgs lib; };
 
@@ -14,49 +19,63 @@ let
   };
   repo1Path = testLib.mkTestRepo site1;
   repo2Path = testLib.mkTestRepo site2;
-in {
+in
+{
   name = "site-builder-multiple";
 
-  nodes.machine = { config, pkgs, ... }: {
-    imports = [ ../../modules/site-builder.nix ];
+  nodes.machine =
+    { config, pkgs, ... }:
+    {
+      imports = [
+        {
+          imports = [ ../../modules/site-builder.nix ];
+          _module.args.customCaddy = customCaddy;
+        }
+      ];
 
-    networking.hosts."127.0.0.1" =
-      [ "first.test" "www.first.test" "second.test" ];
+      networking.hosts."127.0.0.1" = [
+        "first.test"
+        "www.first.test"
+        "second.test"
+      ];
 
-    environment.etc."gitconfig".text = ''
-      [safe]
-          directory = *
-    '';
+      environment.etc."gitconfig".text = ''
+        [safe]
+            directory = *
+      '';
 
-    services.site-builder = {
-      enable = true;
-      sites = {
-        "first.test" = {
-          gitRepo = "file://${repo1Path}";
-          wwwRedirect = true;
-          useHTTPS = false;
-        };
-        "second.test" = {
-          gitRepo = "file://${repo2Path}";
-          wwwRedirect = false;
-          useHTTPS = false;
+      services.site-builder = {
+        enable = true;
+        sites = {
+          "first.test" = {
+            gitRepo = "file://${repo1Path}";
+            wwwRedirect = true;
+            useHTTPS = false;
+          };
+          "second.test" = {
+            gitRepo = "file://${repo2Path}";
+            wwwRedirect = false;
+            useHTTPS = false;
+          };
         };
       };
+
+      virtualisation = {
+        memorySize = 1024;
+        diskSize = 2048;
+      };
+
+      environment.systemPackages = [
+        pkgs.git
+        pkgs.curl
+      ];
+
+      systemd.tmpfiles.rules = [
+        "d /var/www 0755 root root -"
+        "d /var/www/first.test 0755 caddy caddy -"
+        "d /var/www/second.test 0755 caddy caddy -"
+      ];
     };
-
-    virtualisation = {
-      memorySize = 1024;
-      diskSize = 2048;
-    };
-
-    environment.systemPackages = [ pkgs.git pkgs.curl ];
-
-    systemd.tmpfiles.rules = [
-      "d /var/www 0755 root root -"
-      "d /var/www/first.test 0755 caddy caddy -"
-      "d /var/www/second.test 0755 caddy caddy -"
-    ];
-  };
 
   testScript = ''
     start_all()

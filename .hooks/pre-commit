@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+echo "Running nix flake check..."
+if ! nix flake check; then
+    echo "❌ nix flake check failed"
+    echo "Please fix the issues and try committing again"
+    exit 1
+fi
+
+echo "✅ Pre-commit checks passed"
+exit 0

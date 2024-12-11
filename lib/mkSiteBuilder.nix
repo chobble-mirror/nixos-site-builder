@@ -9,35 +9,45 @@ let
 
   builder = (site.builder or "nix");
 
-  builderDefault = if builder == "jekyll" then
-    builtins.readFile ../builders/jekyll.nix
-  else
-    null;
+  builderDefault = if builder == "jekyll" then builtins.readFile ../builders/jekyll.nix else null;
 
-  buildDefaultNixCommand = if builderDefault != null then ''
-    echo "Creating default.nix from builder template"
-    cat > default.nix <<'EOF'
-    ${toString builderDefault}
-    EOF
-  '' else
-    "";
+  buildDefaultNixCommand =
+    if builderDefault != null then
+      ''
+        echo "Creating default.nix from builder template"
+        cat > default.nix <<'EOF'
+        ${toString builderDefault}
+        EOF
+      ''
+    else
+      "";
 
-  deployCommand = if site.host == "neocities" then
-    if site ? dryRun && site.dryRun then ''
-      echo "[DRY RUN] Would push to Neocities now"
-    '' else ''
-      echo "Pushing to Neocities"
-      export NEOCITIES_API_KEY="${site.apiKey}"
-      ${pkgs.neocities-cli}/bin/neocities push --prune /var/www/${domain}
-    ''
-  else ''
-    # For Caddy, files are already in the correct place
-    echo "Made /var/www/${domain} for Caddy serving"
-  '';
-in pkgs.writeShellApplication {
+  deployCommand =
+    if site.host == "neocities" then
+      if site ? dryRun && site.dryRun then
+        ''
+          echo "[DRY RUN] Would push to Neocities now"
+        ''
+      else
+        ''
+          echo "Pushing to Neocities"
+          export NEOCITIES_API_KEY="${site.apiKey}"
+          ${pkgs.neocities-cli}/bin/neocities push --prune /var/www/${domain}
+        ''
+    else
+      ''
+        # For Caddy, files are already in the correct place
+        echo "Made /var/www/${domain} for Caddy serving"
+      '';
+in
+pkgs.writeShellApplication {
   name = "site-builder-${domain}";
-  runtimeInputs = with pkgs;
-    [ git nix ]
+  runtimeInputs =
+    with pkgs;
+    [
+      git
+      nix
+    ]
     ++ (if site.host == "neocities" then [ neocities-cli ] else [ ]);
 
   text = ''
@@ -99,6 +109,21 @@ in pkgs.writeShellApplication {
       if [ -z "$www_dir" ]; then
         fail "www_dir is not set!"
       fi
+
+      
+     ${
+       if site ? subfolder && site.subfolder != null then
+         ''
+           echo "Using subfolder: ${site.subfolder}"
+           if [ ! -d "${site.subfolder}" ]; then
+             fail "Subfolder ${site.subfolder} does not exist in repository"
+           fi
+           cd "${site.subfolder}" || fail "Could not change to subfolder"
+         ''
+       else
+         ""
+     }
+
 
       ${buildDefaultNixCommand}
 

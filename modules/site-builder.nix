@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -19,7 +24,10 @@ let
         description = "Git branch to track";
       };
       builder = mkOption {
-        type = types.enum [ "nix" "jekyll" ];
+        type = types.enum [
+          "nix"
+          "jekyll"
+        ];
         default = "nix";
         description = "Site builder to use. Either 'nix' (default) or 'jekyll'";
       };
@@ -34,9 +42,18 @@ let
         description = "Whether to use HTTPS for this site";
       };
       host = mkOption {
-        type = types.enum [ "caddy" "neocities" ];
+        type = types.enum [
+          "caddy"
+          "neocities"
+        ];
         default = "caddy";
         description = "Hosting service to use (caddy or neocities)";
+      };
+      subfolder = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Subfolder within the repository to use as the site root";
+        example = "public";
       };
       apiKey = mkOption {
         type = types.nullOr types.str;
@@ -54,10 +71,10 @@ let
   # Import the library functions
   siteLib = import ../lib { inherit pkgs; };
 
-  hasCaddySites = sites:
-    lib.any (cfg: (cfg.host or "caddy") == "caddy") (builtins.attrValues sites);
+  hasCaddySites = sites: lib.any (cfg: (cfg.host or "caddy") == "caddy") (builtins.attrValues sites);
 
-in {
+in
+{
   options.services.site-builder = {
     enable = mkEnableOption ("static site builder service");
 
@@ -94,8 +111,7 @@ in {
     assertions = [
       {
         assertion = cfg.sites != { };
-        message =
-          "At least one site must be configured when site-builder is enabled";
+        message = "At least one site must be configured when site-builder is enabled";
       }
       {
         assertion = !hasCaddySites cfg.sites || cfg.caddy.enable;

@@ -7,6 +7,7 @@ let
     let
       host = cfg.host or "caddy";
       mkLogFormat = domain: ''
+        format transform "{common_log}"
         output file /var/log/caddy/${domain}.log {
           roll_size 1mb
           roll_keep 1

@@ -43,6 +43,7 @@ let
               Access-Control-Allow-Origin https://git.chobble.com
               Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
               Access-Control-Allow-Headers *
+              Vary Origin
             }
 
             @uptime_kuma header_regexp User-Agent ^Uptime-Kuma

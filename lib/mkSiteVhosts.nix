@@ -39,6 +39,10 @@ let
             }
             header @static Cache-Control max-age=5184000
 
+            header /admin/* {
+              Access-Control-Allow-Origin https://git.chobble.com
+            }
+
             @uptime_kuma header_regexp User-Agent ^Uptime-Kuma
             log_skip @uptime_kuma
           '';

@@ -35,9 +35,9 @@ let
             }
 
             @static {
-              path_regexp \.(ico|css|js|gif|jpg|jpeg|png|svg|webp|woff)$
+              path_regexp \.(ico|css|js|gif|jpg|jpeg|png|svg|webp|woff|woff2)$
             }
-            header @static Cache-Control max-age=5184000
+            header @static Cache-Control max-age=31536000
 
             @uptime_kuma header_regexp User-Agent ^Uptime-Kuma
             log_skip @uptime_kuma

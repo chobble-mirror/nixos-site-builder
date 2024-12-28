@@ -25,7 +25,7 @@
         pkgs:
         (pkgs.extend caddy.overlays.default).caddy.withPlugins {
           plugins = [ "github.com/caddyserver/transform-encoder" ];
-          hash = "sha256-9kgxIpIwC5asZ0PV8P6LO8HHVa3udHMSNNI/zV3lmAM=";
+          hash = "sha256-l2Q+u+oYDDzuKE8EcOTDWcjPH+Y1P3R2ORSYmf6Zc7E=";
         };
     in
     {

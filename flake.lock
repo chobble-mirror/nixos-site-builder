@@ -1,22 +1,5 @@
 {
   "nodes": {
-    "caddy": {
-      "locked": {
-        "lastModified": 1732948222,
-        "narHash": "sha256-kUWyjeqkU+RHTHVXT61QF19eW2vnWgah5OcPrUlU8oU=",
-        "owner": "vincentbernat",
-        "repo": "caddy-nix",
-        "rev": "9d13eb684b4ba1b2eb92e76f7ea1f517eccc4fe1",
-        "type": "github"
-      },
-      "original": {
-        "narHash": "sha256-kUWyjeqkU+RHTHVXT61QF19eW2vnWgah5OcPrUlU8oU=",
-        "owner": "vincentbernat",
-        "repo": "caddy-nix",
-        "rev": "9d13eb684b4ba1b2eb92e76f7ea1f517eccc4fe1",
-        "type": "github"
-      }
-    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -38,23 +21,22 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1733550349,
-        "narHash": "sha256-NcGumB4Lr6KSDq+nIqXtNA8QwAQKDSZT7N9OTGWbTrs=",
+        "lastModified": 1738410390,
+        "narHash": "sha256-xvTo0Aw0+veek7hvEVLzErmJyQkEcRk6PSR4zsRQFEc=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "e2605d0744c2417b09f8bf850dfca42fcf537d34",
+        "rev": "3a228057f5b619feb3186e986dbe76278d707b6e",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
-        "ref": "nixos-24.11",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
     },
     "root": {
       "inputs": {
-        "caddy": "caddy",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs"
       }

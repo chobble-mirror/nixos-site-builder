@@ -2,7 +2,6 @@
   pkgs,
   lib,
   utils,
-  customCaddy,
 }:
 
 let
@@ -22,7 +21,6 @@ builtins.mapAttrs (
         pkgs
         lib
         utils
-        customCaddy
         ;
     }
   )

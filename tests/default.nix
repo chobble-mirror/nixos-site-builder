@@ -1,7 +1,6 @@
 {
   pkgs,
   utils,
-  customCaddy,
 }:
 let
   lib = pkgs.lib;
@@ -12,7 +11,6 @@ let
         pkgs
         lib
         utils
-        customCaddy
         ;
     };
 in

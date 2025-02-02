@@ -2,7 +2,6 @@
   pkgs,
   lib,
   utils,
-  customCaddy,
 }:
 let
   testLib = import ./lib.nix { inherit pkgs lib; };
@@ -30,10 +29,7 @@ in
     { config, pkgs, ... }:
     {
       imports = [
-        {
-          imports = [ ../../modules/site-builder.nix ];
-          _module.args.customCaddy = customCaddy;
-        }
+        ../../modules/site-builder.nix
       ];
       networking.hosts."127.0.0.1" = [ "example.test" ];
 

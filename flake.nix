@@ -2,10 +2,8 @@
   description = "NixOS static site builder and server";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils/11707dc2f618dd54ca8739b309ec4fc024de578b?narHash=sha256-l0KFg5HjrsfsO/JpG%2Br7fRrqm12kzFHyUHqHCVpMMbI%3D";
-    caddy.url = "github:vincentbernat/caddy-nix/9d13eb684b4ba1b2eb92e76f7ea1f517eccc4fe1?narHash=sha256-kUWyjeqkU%2BRHTHVXT61QF19eW2vnWgah5OcPrUlU8oU%3D";
-
   };
 
   outputs =
@@ -13,7 +11,6 @@
       self,
       nixpkgs,
       flake-utils,
-      caddy,
     }:
     let
       supportedSystems = [
@@ -21,12 +18,6 @@
         "aarch64-linux"
       ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-      mkCustomCaddy =
-        pkgs:
-        (pkgs.extend caddy.overlays.default).caddy.withPlugins {
-          plugins = [ "github.com/caddyserver/transform-encoder" ];
-          hash = "sha256-l2Q+u+oYDDzuKE8EcOTDWcjPH+Y1P3R2ORSYmf6Zc7E=";
-        };
     in
     {
       nixosModules.default =
@@ -38,7 +29,6 @@
         }:
         {
           imports = [ (import ./modules/site-builder.nix) ];
-          _module.args.customCaddy = mkCustomCaddy pkgs;
         };
 
       checks = forAllSystems (
@@ -49,7 +39,6 @@
         in
         import ./tests {
           inherit pkgs utils;
-          customCaddy = mkCustomCaddy pkgs;
         }
       );
 

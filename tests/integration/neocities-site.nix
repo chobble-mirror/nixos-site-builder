@@ -2,7 +2,6 @@
   pkgs,
   lib,
   utils,
-  customCaddy,
 }:
 
 with import ./lib.nix { inherit pkgs lib; };

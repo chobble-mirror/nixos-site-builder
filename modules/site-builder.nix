@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  customCaddy,
   ...
 }:
 
@@ -128,8 +127,11 @@ in
 
     services.caddy = mkIf (cfg.caddy.enable && hasCaddySites cfg.sites) {
       enable = true;
-      package = customCaddy;
       virtualHosts = siteLib.mkSiteVhosts cfg.sites;
+      package = pkgs.caddy.withPlugins {
+        plugins = [ "github.com/caddyserver/transform-encoder@v0.0.0-20241223111140-47f376e021ef" ];
+        hash = "sha256-v+7HOhXcJXwmVyev3+5a6oVFhXqKCnCqYdvNZrvAgVw=";
+      };
     };
 
     environment.systemPackages = [ (siteLib.mkSiteCommands cfg.sites) ];

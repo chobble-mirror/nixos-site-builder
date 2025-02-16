@@ -86,13 +86,13 @@ in
         Each site is configured with a git repository and optional settings.
       '';
       example = literalExpression ''
-        {
-          "example.com" = {
-            gitRepo = "https://github.com/example/site.git";
-            branch = "main";
-            wwwRedirect = true;
-          };
-        }
+                {
+                  "example.com" = {
+                    gitRepo = "https://github.com/example/site.git";
+                    branch = "main";
+        :            wwwRedirect = true;
+                  };
+                }
       '';
     };
 
@@ -130,7 +130,7 @@ in
       virtualHosts = siteLib.mkSiteVhosts cfg.sites;
       package = pkgs.caddy.withPlugins {
         plugins = [ "github.com/caddyserver/transform-encoder@v0.0.0-20241223111140-47f376e021ef" ];
-        hash = "sha256-v+7HOhXcJXwmVyev3+5a6oVFhXqKCnCqYdvNZrvAgVw=";
+        hash = "sha256-pq+HSu1n11oxIJHMBqN8M8YnXaR2ASJtDbdUwdVIn+s=";
       };
     };
 

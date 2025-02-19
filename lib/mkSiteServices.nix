@@ -68,6 +68,8 @@ let
 
           Type = "oneshot";
           DynamicUser = "yes";
+          StateDirectory = serviceUser;
+          Environment = "HOME=/var/lib/${serviceUser}";
           User = serviceUser;
           Group = serviceUser;
         };

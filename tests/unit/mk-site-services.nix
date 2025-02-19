@@ -1,4 +1,8 @@
-{ pkgs, lib, utils }:
+{
+  pkgs,
+  lib,
+  utils,
+}:
 
 let
   # Import the actual implementation
@@ -19,13 +23,15 @@ let
   serviceUser = mkServiceName "example.com";
   result = mkSiteServices testSites;
 
-  normalizeService = service:
+  normalizeService =
+    service:
     let
       # Remove the script field and normalize paths
       cleanService = removeAttrs service [ "script" ];
 
       # Convert derivation paths to strings
-      normalizePaths = x:
+      normalizePaths =
+        x:
         if builtins.isList x then
           map normalizePaths x
         else if builtins.isAttrs x then
@@ -34,13 +40,19 @@ let
           toString x
         else
           x;
-    in normalizePaths cleanService;
+    in
+    normalizePaths cleanService;
 
   normalizedResult = lib.mapAttrs (name: normalizeService) result;
   expectedService = {
     ${serviceUser} = {
       description = "Build example.com website";
-      path = with pkgs; [ bash curl git nix ];
+      path = with pkgs; [
+        bash
+        curl
+        git
+        nix
+      ];
       environment = {
         NIX_PATH = "nixpkgs=${pkgs.path}";
         SITE_DOMAIN = "example.com";
@@ -49,7 +61,10 @@ let
       };
       serviceConfig = {
         CapabilityBoundingSet = "";
-        IPAddressAllow = [ "0.0.0.0/0" "::/0" ];
+        IPAddressAllow = [
+          "0.0.0.0/0"
+          "::/0"
+        ];
         NoNewPrivileges = true;
         PrivateDevices = true;
         PrivateNetwork = false;
@@ -59,16 +74,26 @@ let
         ProtectKernelModules = true;
         ProtectKernelTunables = true;
         ProtectSystem = "strict";
-        ReadWritePaths = [ "/var/lib/${serviceUser}" "/var/www/example.com" ];
+        ReadWritePaths = [
+          "/var/lib/${serviceUser}"
+          "/var/www/example.com"
+        ];
         BindReadOnlyPaths = [
           "/etc/resolv.conf"
           "/etc/ssl"
           "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
         ];
-        RestrictAddressFamilies = [ "AF_INET" "AF_INET6" "AF_UNIX" ];
+        RestrictAddressFamilies = [
+          "AF_INET"
+          "AF_INET6"
+          "AF_UNIX"
+        ];
         RestrictNamespaces = true;
         RestrictRealtime = true;
         Type = "oneshot";
+        DynamicUser = "yes";
+        StateDirectory = serviceUser;
+        Environment = "HOME=/var/lib/${serviceUser}";
         User = serviceUser;
         Group = serviceUser;
       };
@@ -86,26 +111,32 @@ let
   expectedFile = pkgs.writeText "expected.json" expectedJson;
   resultFile = pkgs.writeText "result.json" resultJson;
 
-in pkgs.runCommand "test-mk-site-services" {
-  buildInputs = [ pkgs.jq pkgs.diffutils ];
-  inherit resultJson expectedJson;
-  inherit (result.${serviceUser}) script;
-} ''
-  # Compare the JSON structures
-  if ! diff -u \
-    <(jq . ${expectedFile}) \
-    <(jq . ${resultFile}); then
-    echo "Service structure test failed!"
-    exit 1
-  fi
+in
+pkgs.runCommand "test-mk-site-services"
+  {
+    buildInputs = [
+      pkgs.jq
+      pkgs.diffutils
+    ];
+    inherit resultJson expectedJson;
+    inherit (result.${serviceUser}) script;
+  }
+  ''
+    # Compare the JSON structures
+    if ! diff -u \
+      <(jq . ${expectedFile}) \
+      <(jq . ${resultFile}); then
+      echo "Service structure test failed!"
+      exit 1
+    fi
 
-  # Check the script path
-  if [[ ! "$script" =~ ^/nix/store/.*-site-builder-example.com/bin/site-builder-example.com$ ]]; then
-    echo "Script path test failed!"
-    echo "Expected script path matching: /nix/store/*-site-builder-example.com/bin/site-builder-example.com"
-    echo "Got: $script"
-    exit 1
-  fi
+    # Check the script path
+    if [[ ! "$script" =~ ^/nix/store/.*-site-builder-example.com/bin/site-builder-example.com$ ]]; then
+      echo "Script path test failed!"
+      echo "Expected script path matching: /nix/store/*-site-builder-example.com/bin/site-builder-example.com"
+      echo "Got: $script"
+      exit 1
+    fi
 
-  touch $out
-''
+    touch $out
+  ''

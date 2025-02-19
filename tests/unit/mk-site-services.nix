@@ -91,9 +91,6 @@ let
         RestrictNamespaces = true;
         RestrictRealtime = true;
         Type = "oneshot";
-        DynamicUser = "yes";
-        StateDirectory = serviceUser;
-        Environment = "HOME=/var/lib/${serviceUser}";
         User = serviceUser;
         Group = serviceUser;
       };

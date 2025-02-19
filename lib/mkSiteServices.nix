@@ -1,18 +1,28 @@
-{ pkgs, utils
-, mkSiteBuilder ? import ./mkSiteBuilder.nix { inherit pkgs utils; } }:
+{
+  pkgs,
+  utils,
+  mkSiteBuilder ? import ./mkSiteBuilder.nix { inherit pkgs utils; },
+}:
 
 sites:
 let
   inherit (utils) mkServiceName;
 
-  mkService = domain: cfg:
+  mkService =
+    domain: cfg:
     let
       serviceUser = mkServiceName domain;
       siteBuilder = mkSiteBuilder domain cfg;
-    in {
+    in
+    {
       "${serviceUser}" = {
         description = "Build ${domain} website";
-        path = with pkgs; [ bash curl git nix ];
+        path = with pkgs; [
+          bash
+          curl
+          git
+          nix
+        ];
         environment = {
           NIX_PATH = "nixpkgs=${pkgs.path}";
           SITE_DOMAIN = domain;
@@ -24,7 +34,10 @@ let
 
         serviceConfig = {
           CapabilityBoundingSet = "";
-          IPAddressAllow = [ "0.0.0.0/0" "::/0" ];
+          IPAddressAllow = [
+            "0.0.0.0/0"
+            "::/0"
+          ];
           NoNewPrivileges = true;
           PrivateDevices = true;
           PrivateNetwork = false;
@@ -34,11 +47,18 @@ let
           ProtectKernelModules = true;
           ProtectKernelTunables = true;
           ProtectSystem = "strict";
-          RestrictAddressFamilies = [ "AF_INET" "AF_INET6" "AF_UNIX" ];
+          RestrictAddressFamilies = [
+            "AF_INET"
+            "AF_INET6"
+            "AF_UNIX"
+          ];
           RestrictNamespaces = true;
           RestrictRealtime = true;
 
-          ReadWritePaths = [ "/var/lib/${serviceUser}" "/var/www/${domain}" ];
+          ReadWritePaths = [
+            "/var/lib/${serviceUser}"
+            "/var/www/${domain}"
+          ];
 
           BindReadOnlyPaths = [
             "/etc/resolv.conf"
@@ -47,10 +67,13 @@ let
           ];
 
           Type = "oneshot";
+          DynamicUser = "yes";
           User = serviceUser;
           Group = serviceUser;
         };
       };
     };
-in builtins.foldl' (acc: domain: acc // (mkService domain sites.${domain})) { }
-(builtins.attrNames sites)
+in
+builtins.foldl' (acc: domain: acc // (mkService domain sites.${domain})) { } (
+  builtins.attrNames sites
+)

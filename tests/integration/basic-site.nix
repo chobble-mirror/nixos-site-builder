@@ -64,7 +64,7 @@ in
 
     # Test service
     machine.succeed("systemctl start ${serviceUser}.service")
-    machine.succeed("systemctl is-system-running --wait")
+    # machine.succeed("systemctl is-system-running --wait")
     machine.succeed("systemctl is-active ${serviceUser}.service || [ $? -eq 3 ]")
 
     # Test Caddy

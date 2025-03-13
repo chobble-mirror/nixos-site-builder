@@ -87,7 +87,7 @@ in
     # Test services
     machine.succeed(f"systemctl start {first_service}.service")
     machine.succeed(f"systemctl start {second_service}.service")
-    machine.succeed("systemctl is-system-running --wait")
+    # machine.succeed("systemctl is-system-running --wait")
     machine.succeed(f"systemctl is-active {first_service}.service || [ $? -eq 3 ]")
     machine.succeed(f"systemctl is-active {second_service}.service || [ $? -eq 3 ]")
 

@@ -128,10 +128,6 @@ in
     services.caddy = mkIf (cfg.caddy.enable && hasCaddySites cfg.sites) {
       enable = true;
       virtualHosts = siteLib.mkSiteVhosts cfg.sites;
-      package = pkgs.caddy.withPlugins {
-        plugins = [ "github.com/caddyserver/transform-encoder@v0.0.0-20241223111140-47f376e021ef" ];
-        hash = "sha256-pq+HSu1n11oxIJHMBqN8M8YnXaR2ASJtDbdUwdVIn+s=";
-      };
     };
 
     environment.systemPackages = [ (siteLib.mkSiteCommands cfg.sites) ];

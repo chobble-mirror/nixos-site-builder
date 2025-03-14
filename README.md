@@ -1,3 +1,5 @@
+# ⚠️ NOTE: This is unmaintained - I'm not using Forgejo actions to build and push sites instead, it's much simpler! ⚠️
+
 # NixOS Static Site Builder
 
 This flake grabs and builds static sites (maybe via a `default.nix`) and copies their outputs to `/var/www`

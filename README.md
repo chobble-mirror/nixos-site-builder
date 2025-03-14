@@ -1,4 +1,4 @@
-# ⚠️ NOTE: This is unmaintained - I'm not using Forgejo actions to build and push sites instead, it's much simpler! ⚠️
+# ⚠️ NOTE: This is unmaintained - I'm now using Forgejo actions to build and push sites instead, it's much simpler! ⚠️
 
 # NixOS Static Site Builder
 
